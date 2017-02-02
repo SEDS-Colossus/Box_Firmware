@@ -1,0 +1,344 @@
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              01/29/2017 15:02:30 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE CONTROL_BOX_FIRMWARE
+OBJECT MODULE PLACED IN .\Objects\control_box_firmware.obj
+COMPILER INVOKED BY: C:\Program Files\Keil_C51\C51\BIN\C51.EXE control_box_firmware.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJ
+                    -ECTEXTEND PRINT(.\Listings\control_box_firmware.lst) TABS(2) OBJECT(.\Objects\control_box_firmware.obj)
+
+line level    source
+
+   1          //matts board
+   2          /*************************************************************************
+   3           *  @File Descption: Read states of manual override buttons of control_box
+   4           *  and bi-directional communication via UART with main_board.
+   5           *  @File: control_box_firmware.c
+   6           *  @author(s):
+   7           *  -Tawfic Rabbani, Embedded Systems Engineer, head of softwar
+   8           *  -Matthew Santos, Electrical and Software Engineer
+   9           *  @Property of SEDS UCSD
+  10           *  @since: 10/2016
+  11           *************************************************************************/
+  12          #include "reg60s2.h" //Include reg file for 8051 architecure
+  13          #include <math.h> //used for pow function
+  14          #define OUT_COUNT 19 //1 tog + 12 sw + 2 pot + 4 crc = 19 total send elements
+  15          #define IN_COUNT 30 //TODO: number of elements to receive
+  16          
+  17          /*************************************************************************
+  18           *                            -- VARIABLES --
+  19           *  Each variable is a pin on the MCU that can be read/write 1/0.
+  20           *  Syntax:
+  21           *       varaible-type  variable-name = pin;
+  22           *************************************************************************/
+  23          sfr P4SW = 0xBB;
+  24          
+  25          sbit LED1 = P0^0;
+  26          sbit LED2 = P0^1;
+  27          sbit LED3 = P0^2;
+  28          sbit LED4 = P0^3;
+  29          sbit LED5 = P0^4;
+  30          sbit LED6 = P0^5;
+  31          sbit LED7 = P0^6;
+  32          sbit LED8 = P0^7;
+  33          
+  34          sbit pot1 = P1^0;
+  35          sbit pot2 = P1^1;
+  36          sbit battlvl = P1^2;
+  37          sbit sw1 = P1^3;
+  38          sbit dc = P1^4;
+  39          sbit din = P1^5;
+  40          sbit cs= P1^6;
+  41          sbit sclk = P1^7;
+  42          
+  43          sbit LED12 = P2^7;
+  44          sbit sw8 = P2^6;
+  45          sbit sw9 = P2^5;
+  46          sbit sw10 = P2^4;
+  47          sbit sw11 = P2^3;
+  48          sbit sw12 = P2^2;
+  49          sbit swtog = P2^1;
+  50          sbit LEDtog = P2^0;
+  51          
+  52          sbit sw2 = P3^2;
+  53          sbit sw3 = P3^3;
+  54          sbit sw4 = P3^4;
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              01/29/2017 15:02:30 PAGE 2   
+
+  55          sbit sw5 = P3^5;
+  56          sbit sw6 = P3^6;
+  57          sbit sw7 = P3^7;
+  58          
+  59          sbit LED9 = P4^6;
+  60          sbit LED10 = P4^5;
+  61          sbit LED11 = P4^4;
+  62          
+  63          /*************************************************************************
+  64           *                                   --PROTOTYPES--
+  65           *************************************************************************/
+  66          void uart_init(); //uart initialization
+  67          void timer_init(); //Timer 2 in mode 2 for Baud rate for 9600
+  68          void uart_tx(unsigned char x); //transmit function to send data from 8051 to other device
+  69          unsigned char uart_rx(); //return function to receive data from other device
+  70          bit is_good(); //handshake check
+  71          bit receive(); //receive data from main_board
+  72          bit CRC_check(); //check if no data is lost
+  73          void CRC_generator(); //generate CRC and append to end of data being sent
+  74          void send(); //send data to main_board
+  75          void delay(unsigned int x); //standard delay function
+  76          
+  77          /*************************************************************************
+  78           *                          --GLOBAL VARIABLES--
+  79           *************************************************************************/
+  80          unsigned char input[IN_COUNT]; //stores all recieved inputs
+  81          unsigned char output[OUT_COUNT]; //stores all commands to be sent
+  82          long DIVISOR = 0x17; //x^4+x^2+x+1
+  83          long xor_value = 0x0;
+  84          long crc = 0x0;
+  85          int remainder = 0;
+  86          int i = 0;
+  87          
+  88          /*************************************************************************
+  89           *                          -- MAIN FUNCTION --
+  90           *  @Descption: This function will instatiate the UART connection.
+  91           *               Inside the while(1) is where the main code will be
+  92           *               written.the unsigned char array "input" will be where
+  93           *               commands will be stored when they are sent over and
+  94           *               then evaluated. The first bit of input will indicate
+  95           *               an error message or a state message is being received.
+  96           *               0 is a state message, 1 is an error message. Input loop
+  97           *               will end when '?' is sent. This will be the indicator as
+  98           *               when all informaiton has been sent.
+  99           *
+ 100           *  @PRECONDITION: none
+ 101           *
+ 102           *  @POSTCONDITION: -connenction between two MCU's will be complete
+ 103           *                  -commands will be received and delt with
+ 104           *                  -commands will be sent to other MCU
+ 105           *
+ 106           *  @PARAMETER: none
+ 107           *
+ 108           *  @RETURN: none
+ 109           *************************************************************************/
+ 110          void main() {
+ 111   1        P4SW = 0x70; //enable IO for all of P4
+ 112   1        uart_init(); //must be called to initialize communication
+ 113   1        //while(!is_good()); //wait for handshake
+ 114   1        
+ 115   1        while(1) { //loop forever
+ 116   2          delay(100);
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              01/29/2017 15:02:30 PAGE 3   
+
+ 117   2          for(i=0;i<OUT_COUNT;++i) {
+ 118   3            output[i] = input[i];
+ 119   3          } //end for
+ 120   2          send();
+ 121   2        } //end while
+ 122   1          
+ 123   1      } //end main
+ 124          
+ 125          
+ 126          /*************************************************************************
+ 127           *                          --IS_GOOD--
+ 128           *  @Descption:
+ 129           *
+ 130           *  @PRECONDITION:
+ 131           *
+ 132           *  @POSTCONDITION: checks if an the connection is good
+ 133           *                                 between the two UARTS
+ 134           *
+ 135           *  @PARAMETER: none
+ 136           *
+ 137           *  @RETURN: int
+ 138           *************************************************************************/
+ 139          bit is_good() {
+ 140   1        uart_tx('g');
+ 141   1        if(uart_rx() == 'g')
+ 142   1          return 1;
+ 143   1        else
+ 144   1          return 0;
+ 145   1      }
+ 146          
+ 147          void send() {
+ 148   1        for(i=0;i<OUT_COUNT;++i) {
+ 149   2          uart_tx(output[i]);
+ 150   2        }
+ 151   1      }
+ 152          
+ 153          bit receive() {
+ 154   1        //the number of bits you add to the input is one less than the divisor
+ 155   1        for(i=0;i<IN_COUNT;++i) {
+ 156   2          input[i] = uart_rx();
+ 157   2        }
+ 158   1        if(CRC_check()) //convert input to hex to save space -- this is stored in the global hex array
+ 159   1          return 1;
+ 160   1        return 0;
+ 161   1      }
+ 162          
+ 163          bit CRC_check(){
+ 164   1           xor_value = 0x0;
+ 165   1           crc = 0x0;
+ 166   1           remainder = 0;
+ 167   1           for(i = 0; i != 30; i++);
+ 168   1                crc = crc + (int)input[i]*pow(2,i);
+ 169   1      
+ 170   1           xor_value = crc ^ DIVISOR;
+ 171   1      
+ 172   1           remainder =  remainder + (xor_value % 2);
+ 173   1           xor_value = xor_value/2;
+ 174   1           remainder =  remainder + (xor_value % 2);
+ 175   1           xor_value = xor_value/2;
+ 176   1           remainder =  remainder + (xor_value % 2);
+ 177   1           xor_value = xor_value/2;
+ 178   1           remainder =  remainder + (xor_value % 2);
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              01/29/2017 15:02:30 PAGE 4   
+
+ 179   1      
+ 180   1           if(remainder == 0)
+ 181   1                return 1;
+ 182   1           else
+ 183   1                return 0;
+ 184   1      }
+ 185          
+ 186          void CRC_generator() {
+ 187   1           xor_value = 0x0;
+ 188   1           crc = 0x0;
+ 189   1           remainder = 0;
+ 190   1      
+ 191   1           for(i=0;i<OUT_COUNT;++i)
+ 192   1                crc = crc + (int)output[i]*pow(2,i);
+ 193   1      
+ 194   1           xor_value = crc ^ DIVISOR;
+ 195   1      
+ 196   1           for(i=OUT_COUNT-1; i<OUT_COUNT-5; --i) { // may need to be i != 14. Check through testing
+ 197   2                remainder = xor_value %2;
+ 198   2                xor_value = xor_value/2;
+ 199   2                if (remainder == 1)
+ 200   2                     output[i] = '1';
+ 201   2                else
+ 202   2                     output[i] = '0';
+ 203   2           }
+ 204   1      }
+ 205          
+ 206          /*************************************************************************
+ 207           *                             -- UART INITIALIZATION --
+ 208           *  @Descption: First thing called from the main function. This will
+ 209           *              instantiate the uart
+ 210           *
+ 211           *  @PRECONDITION: main() is called
+ 212           *
+ 213           *  @POSTCONDITION: Data is set to 8 bit length and baud rate set to
+ 214           *                  9600 baud.
+ 215           *
+ 216           *  @PARAMETER: none
+ 217           *
+ 218           *  @RETURN: none
+ 219           *************************************************************************/
+ 220          void uart_init() {
+ 221   1        ES = 1; //Enable UART interrupt
+ 222   1        EA = 1; //Open master interrupt switch
+ 223   1        SCON = 0x50;  //Setting data as 8bit and receive enable
+ 224   1        timer_init(); //baud rate is 9600
+ 225   1      }
+ 226          
+ 227          /*************************************************************************
+ 228           *                       -- TIMER INITIALIZATION --
+ 229           *  @Descption: Timers will be set correct for the 8051 architecure. These
+ 230           *              timers set the reload mode for filling the buffer with
+ 231           *              messages to be sent.
+ 232           *
+ 233           *  @PRECONDITION: uart_init() is called
+ 234           *
+ 235           *  @POSTCONDITION: timers are set for correct reading bit lengths
+ 236           *
+ 237           *  @PARAMETER: none
+ 238           *
+ 239           *  @RETURN: none
+ 240           *************************************************************************/
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              01/29/2017 15:02:30 PAGE 5   
+
+ 241          void timer_init() {
+ 242   1        TMOD = 0x20; //timer 1 in mode 2 i.e. auto reload mode
+ 243   1        TH1 = 0xFD;  //reload value is FD for 9600 baud rate
+ 244   1                     //(Found in table in READ_Me file)
+ 245   1        TR1 = 1;     //Timer 1 enable
+ 246   1      }
+ 247          
+ 248          /*************************************************************************
+ 249           *                       -- UART TRANSMITION --
+ 250           *  @Descption: Sends values to other device using uart transmition.
+ 251           *              Sends the single char value to the buffer and sends the
+ 252           *              char in 8 bits.
+ 253           *
+ 254           *  @PRECONDITION: called from main() from within main while loop
+ 255           *
+ 256           *  @POSTCONDITION: individual message will be sent as one char
+ 257           *
+ 258           *  @PARAMETER: unsigned char
+ 259           *
+ 260           *  @RETURN: none
+ 261           *************************************************************************/
+ 262          void uart_tx(unsigned char x) {
+ 263   1        SBUF = x;   //Load data to serial buffer register associated to UART
+ 264   1        while(!TI); //transmit flag change when MSB is sent
+ 265   1        TI=0;       //clear the transmit flag
+ 266   1      }
+ 267          
+ 268          /*************************************************************************
+ 269           *                         -- UART RECEIVER --
+ 270           *  @Descption: Receives message from other device using the uart
+ 271           *              receiver pin. Message is read from the buffer and sent
+ 272           *              back to the user
+ 273           *
+ 274           *  @PRECONDITION: called from main() from within main while loop
+ 275           *
+ 276           *  @POSTCONDITION: individual 8 bit char read from the buffer and
+ 277           *                  sent back to the user
+ 278           *
+ 279           *  @PARAMETER: none
+ 280           *
+ 281           *  @RETURN: unsigned char
+ 282           *************************************************************************/
+ 283          unsigned char uart_rx() {
+ 284   1        unsigned char z;
+ 285   1        //while(!RI); //receive flag gets changed only when 8bits are received in SBUF
+ 286   1        z = SBUF;   //Moving data into z variable
+ 287   1        RI = 0;
+ 288   1        return(z);
+ 289   1      }
+ 290          
+ 291          /*----------------------------
+ 292          UART interrupt service routine
+ 293          ----------------------------*/
+ 294          void Uart_Isr() interrupt 4 using 1 {
+ 295   1        if(RI) { //RX flag
+ 296   2          ES = 0; //disable UART interrupt
+ 297   2          receive(); //store expected data
+ 298   2          ES = 1; //re-enable UART interrupt
+ 299   2        }
+ 300   1      }
+ 301          
+ 302          void delay(unsigned int x) {
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              01/29/2017 15:02:30 PAGE 6   
+
+ 303   1        unsigned int a;
+ 304   1        unsigned int b;
+ 305   1        for(a=x;a>0;a--) {
+ 306   2          for(b=1000;b>0;b--) {
+ 307   3            continue;
+ 308   3          }
+ 309   2        }
+ 310   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    847    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     65    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
