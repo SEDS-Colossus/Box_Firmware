@@ -137,7 +137,7 @@ void main() {
 				sw10B = !sw10B;
 			}
 		} */
-		delay(50);
+		delay(300);
 		LED10 = !sw10B;
 		//delay(10);
 	}

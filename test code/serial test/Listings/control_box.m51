@@ -1,36 +1,19 @@
-BL51 BANKED LINKER/LOCATER V6.22                                                        01/29/2017  15:02:30  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22                                                        02/04/2017  15:23:52  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
-C:\PROGRAM FILES\KEIL_C51\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\control_box_firmware.obj TO .\Objects\contro
->> l_box PRINT (.\Listings\control_box.m51) RAMSIZE (256)
+C:\PROGRAM FILES\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\control_box_firmware.obj TO .\Objects\control
+>> _box PRINT (.\Listings\control_box.m51) RAMSIZE (256)
 
 
-MEMORY MODEL: SMALL WITH FLOATING POINT ARITHMETIC
+MEMORY MODEL: SMALL
 
 
 INPUT MODULES INCLUDED:
   .\Objects\STARTUP.obj (?C_STARTUP)
   .\Objects\control_box_firmware.obj (CONTROL_BOX_FIRMWARE)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPADD)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPMUL)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FCAST)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?CASTF)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (POW)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPGETOPN)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?CHKFLOAT)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPCMP)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPNEG)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (EXP)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (LOG)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPDIV)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51FPS.LIB (?C?FPSERIES)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C_INIT)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C?SLDIV)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C?LNEG)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C?LLDCODE)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C?LLDCODE0)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C?ULDIV)
+  C:\PROGRAM FILES\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+  C:\PROGRAM FILES\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
 
 
 LINK MAP OF MODULE:  .\Objects\control_box (?C_STARTUP)
@@ -42,84 +25,50 @@ LINK MAP OF MODULE:  .\Objects\control_box (?C_STARTUP)
             * * * * * * *   D A T A   M E M O R Y   * * * * * * *
             REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
             REG     0008H     0008H     ABSOLUTE     "REG BANK 1"
-            DATA    0010H     000EH     UNIT         _DATA_GROUP_
+            DATA    0010H     000EH     UNIT         ?DT?CONTROL_BOX_FIRMWARE
                     001EH     0002H                  *** GAP ***
-            BIT     0020H.0   0000H.1   UNIT         _BIT_GROUP_
-                    0020H.1   0000H.7                *** GAP ***
-            DATA    0021H     0041H     UNIT         ?DT?CONTROL_BOX_FIRMWARE
-            IDATA   0062H     0001H     UNIT         ?STACK
+            BIT     0020H.0   0000H.3   UNIT         ?BI?CONTROL_BOX_FIRMWARE
+                    0020H.3   0000H.5                *** GAP ***
+            DATA    0021H     0003H     UNIT         _DATA_GROUP_
+            IDATA   0024H     0001H     UNIT         ?STACK
 
             * * * * * * *   C O D E   M E M O R Y   * * * * * * *
             CODE    0000H     0003H     ABSOLUTE     
                     0003H     0020H                  *** GAP ***
             CODE    0023H     0003H     ABSOLUTE     
                     0026H     07DAH                  *** GAP ***
-            CODE    0800H     054AH     UNIT         ?C?LIB_CODE
-            CODE    0D4AH     0151H     UNIT         ?PR?CRC_CHECK?CONTROL_BOX_FIRMWARE
-            CODE    0E9BH     0135H     UNIT         ?PR?LOG?LOG
-            CODE    0FD0H     0117H     UNIT         ?PR?_POW?POW
-            CODE    10E7H     010FH     UNIT         ?PR?CRC_GENERATOR?CONTROL_BOX_FIRMWARE
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 2
-
-
-            CODE    11F6H     009AH     UNIT         ?PR?EXP?EXP
-            CODE    1290H     008CH     UNIT         ?C_C51STARTUP
-            CODE    131CH     0044H     UNIT         ?C?LDIV
-            CODE    1360H     0033H     UNIT         ?PR?MAIN?CONTROL_BOX_FIRMWARE
-            CODE    1393H     002AH     UNIT         ?PR?RECEIVE?CONTROL_BOX_FIRMWARE
-            CODE    13BDH     0023H     UNIT         ?PR?SEND?CONTROL_BOX_FIRMWARE
-            CODE    13E0H     0022H     UNIT         ?PR?UART_ISR?CONTROL_BOX_FIRMWARE
-            CODE    1402H     001EH     UNIT         ?PR?_DELAY?CONTROL_BOX_FIRMWARE
-            CODE    1420H     001BH     UNIT         ?C_INITSEG
-            CODE    143BH     000FH     UNIT         ?PR?IS_GOOD?CONTROL_BOX_FIRMWARE
-            CODE    144AH     000AH     UNIT         ?PR?UART_INIT?CONTROL_BOX_FIRMWARE
-            CODE    1454H     0009H     UNIT         ?PR?TIMER_INIT?CONTROL_BOX_FIRMWARE
-            CODE    145DH     0008H     UNIT         ?PR?_UART_TX?CONTROL_BOX_FIRMWARE
-            CODE    1465H     0005H     UNIT         ?PR?UART_RX?CONTROL_BOX_FIRMWARE
+            CODE    0800H     008CH     UNIT         ?C_C51STARTUP
+            CODE    088CH     004AH     UNIT         ?PR?MAIN?CONTROL_BOX_FIRMWARE
+            CODE    08D6H     0042H     UNIT         ?PR?UART_ISR?CONTROL_BOX_FIRMWARE
+            CODE    0918H     0025H     UNIT         ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE
+            CODE    093DH     001EH     UNIT         ?PR?_DELAY?CONTROL_BOX_FIRMWARE
+            CODE    095BH     001CH     UNIT         ?CO?CONTROL_BOX_FIRMWARE
+            CODE    0977H     0019H     UNIT         ?C?LIB_CODE
+            CODE    0990H     000DH     UNIT         ?C_INITSEG
+            CODE    099DH     0008H     UNIT         ?PR?_SENDDATA?CONTROL_BOX_FIRMWARE
 
 
 
 OVERLAY MAP OF MODULE:   .\Objects\control_box (?C_STARTUP)
 
 
-SEGMENT                                           BIT_GROUP          DATA_GROUP 
-  +--> CALLED SEGMENT                          START    LENGTH     START    LENGTH
-----------------------------------------------------------------------------------
-?C_C51STARTUP                                  -----    -----      -----    -----
+SEGMENT                                        DATA_GROUP 
+  +--> CALLED SEGMENT                        START    LENGTH
+------------------------------------------------------------
+?C_C51STARTUP                                -----    -----
   +--> ?PR?MAIN?CONTROL_BOX_FIRMWARE
   +--> ?C_INITSEG
 
-?PR?MAIN?CONTROL_BOX_FIRMWARE                  -----    -----      -----    -----
-  +--> ?PR?UART_INIT?CONTROL_BOX_FIRMWARE
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 2
+
+
+?PR?MAIN?CONTROL_BOX_FIRMWARE                -----    -----
+  +--> ?CO?CONTROL_BOX_FIRMWARE
+  +--> ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE
   +--> ?PR?_DELAY?CONTROL_BOX_FIRMWARE
-  +--> ?PR?SEND?CONTROL_BOX_FIRMWARE
 
-?PR?UART_INIT?CONTROL_BOX_FIRMWARE             -----    -----      -----    -----
-  +--> ?PR?TIMER_INIT?CONTROL_BOX_FIRMWARE
-
-?PR?SEND?CONTROL_BOX_FIRMWARE                  -----    -----      -----    -----
-  +--> ?PR?_UART_TX?CONTROL_BOX_FIRMWARE
-
-*** NEW ROOT ***************************************************
-
-?PR?UART_ISR?CONTROL_BOX_FIRMWARE              -----    -----      -----    -----
-  +--> ?PR?RECEIVE?CONTROL_BOX_FIRMWARE
-
-?PR?RECEIVE?CONTROL_BOX_FIRMWARE               -----    -----      -----    -----
-  +--> ?PR?UART_RX?CONTROL_BOX_FIRMWARE
-  +--> ?PR?CRC_CHECK?CONTROL_BOX_FIRMWARE
-
-?PR?CRC_CHECK?CONTROL_BOX_FIRMWARE             -----    -----      -----    -----
-  +--> ?PR?_POW?POW
-
-?PR?_POW?POW                                   -----    -----      0010H    000AH
-  +--> ?PR?LOG?LOG
-  +--> ?PR?EXP?EXP
-
-?PR?LOG?LOG                                    0020H.0  0000H.1    001AH    0004H
-
-
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 3
+?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE         0021H    0003H
+  +--> ?PR?_SENDDATA?CONTROL_BOX_FIRMWARE
 
 
 
@@ -129,8 +78,8 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   ----------------------------------
 
   -------         MODULE        ?C_STARTUP
-  C:1290H         SEGMENT       ?C_C51STARTUP
-  I:0062H         SEGMENT       ?STACK
+  C:0800H         SEGMENT       ?C_C51STARTUP
+  I:0024H         SEGMENT       ?STACK
   C:0000H         PUBLIC        ?C_STARTUP
   D:00E0H         SYMBOL        ACC
   D:00F0H         SYMBOL        B
@@ -139,7 +88,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   N:0000H         SYMBOL        IBPSTACK
   N:0100H         SYMBOL        IBPSTACKTOP
   N:0080H         SYMBOL        IDATALEN
-  C:1293H         SYMBOL        IDATALOOP
+  C:0803H         SYMBOL        IDATALOOP
   N:0000H         SYMBOL        PBPSTACK
   N:0100H         SYMBOL        PBPSTACKTOP
   N:0000H         SYMBOL        PDATALEN
@@ -148,18 +97,18 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   N:0000H         SYMBOL        PPAGEENABLE
   D:00A0H         SYMBOL        PPAGE_SFR
   D:0081H         SYMBOL        SP
-  C:1290H         SYMBOL        STARTUP1
+  C:0800H         SYMBOL        STARTUP1
   N:0000H         SYMBOL        XBPSTACK
   N:0000H         SYMBOL        XBPSTACKTOP
   N:0000H         SYMBOL        XDATALEN
   N:0000H         SYMBOL        XDATASTART
   C:0000H         LINE#         126
-  C:1290H         LINE#         133
-  C:1292H         LINE#         134
-  C:1293H         LINE#         135
-  C:1294H         LINE#         136
-  C:1296H         LINE#         185
-  C:1299H         LINE#         196
+  C:0800H         LINE#         133
+  C:0802H         LINE#         134
+  C:0803H         LINE#         135
+  C:0804H         LINE#         136
+  C:0806H         LINE#         185
+  C:0809H         LINE#         196
   -------         ENDMOD        ?C_STARTUP
 
   -------         MODULE        CONTROL_BOX_FIRMWARE
@@ -170,267 +119,130 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   D:00B0H         PUBLIC        P3
   D:00C0H         PUBLIC        P4
   D:00C8H         PUBLIC        P5
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 3
+
+
   B:00A8H.7       PUBLIC        EA
   D:00E8H         PUBLIC        P6
-  C:10E7H         PUBLIC        CRC_generator
   D:00F8H         PUBLIC        P7
-  C:1465H         PUBLIC        uart_rx
-  C:145DH         PUBLIC        _uart_tx
+  C:0918H         PUBLIC        _SendString
+  C:099DH         PUBLIC        _SendData
+  B:0020H.0       PUBLIC        storing
   D:00A8H         PUBLIC        IE
-  C:1402H         PUBLIC        _delay
+  C:093DH         PUBLIC        _delay
   B:00A8H.4       PUBLIC        ES
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 4
-
-
   D:00B8H         PUBLIC        IP
+  D:0010H         PUBLIC        index
   B:0098H.0       PUBLIC        RI
   B:0098H.1       PUBLIC        TI
-  D:0021H         PUBLIC        DIVISOR
   D:00D8H         PUBLIC        CCON
-  C:1360H         PUBLIC        main
-  C:13BDH         PUBLIC        send
-  C:13E0H         PUBLIC        Uart_Isr
-  D:00BBH         PUBLIC        P4SW
+  C:088CH         PUBLIC        main
+  C:08D6H         PUBLIC        Uart_Isr
   D:0099H         PUBLIC        SBUF
-  D:0025H         PUBLIC        input
+  D:0012H         PUBLIC        input
   D:0098H         PUBLIC        SCON
-  D:0043H         PUBLIC        output
   D:0089H         PUBLIC        TMOD
   D:0088H         PUBLIC        TCON
-  D:0056H         PUBLIC        crc
-  C:0D4AH         PUBLIC        CRC_check
-  C:1454H         PUBLIC        timer_init
-  D:005AH         PUBLIC        remainder
+  B:0020H.1       PUBLIC        busy
+  B:0020H.2       PUBLIC        dataChanged
   D:008DH         PUBLIC        TH1
-  C:144AH         PUBLIC        uart_init
   B:0088H.6       PUBLIC        TR1
-  D:005CH         PUBLIC        xor_value
-  C:1393H         PUBLIC        receive
-  D:0060H         PUBLIC        i
-  C:143BH         PUBLIC        is_good
+  D:001CH         PUBLIC        i
   D:00D0H         PUBLIC        PSW
   -------         PROC          MAIN
-  C:1360H         LINE#         110
-  C:1360H         LINE#         111
-  C:1363H         LINE#         112
-  C:1366H         LINE#         115
-  C:1366H         LINE#         116
-  C:136DH         LINE#         117
-  C:1372H         LINE#         118
-  C:1380H         LINE#         119
-  C:138EH         LINE#         120
-  C:1391H         LINE#         121
+  C:088CH         LINE#         94
+  C:088CH         LINE#         95
+  C:088CH         LINE#         96
+  C:0891H         LINE#         97
+  C:0899H         LINE#         98
+  C:08A7H         LINE#         99
+  C:08AAH         LINE#         100
+  C:08ADH         LINE#         101
+  C:08B0H         LINE#         102
+  C:08B2H         LINE#         103
+  C:08B4H         LINE#         104
+  C:08B6H         LINE#         105
+  C:08BFH         LINE#         106
+  C:08BFH         LINE#         107
+  C:08C6H         LINE#         108
+  C:08C9H         LINE#         109
+  C:08D2H         LINE#         110
+  C:08D4H         LINE#         111
+  C:08D4H         LINE#         112
   -------         ENDPROC       MAIN
-  -------         PROC          IS_GOOD
-  C:143BH         LINE#         139
-  C:143BH         LINE#         140
-  C:1440H         LINE#         141
-  C:1446H         LINE#         142
-  C:1448H         LINE#         144
-  C:1449H         LINE#         145
-  -------         ENDPROC       IS_GOOD
-  -------         PROC          SEND
-  C:13BDH         LINE#         147
-  C:13BDH         LINE#         148
-  C:13C2H         LINE#         149
-  C:13CCH         LINE#         150
-  C:13DFH         LINE#         151
-  -------         ENDPROC       SEND
-  -------         PROC          RECEIVE
-  C:1393H         LINE#         153
-  C:1393H         LINE#         155
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 5
-
-
-  C:1398H         LINE#         156
-  C:13A2H         LINE#         157
-  C:13B5H         LINE#         158
-  C:13BAH         LINE#         159
-  C:13BBH         LINE#         160
-  C:13BCH         LINE#         161
-  -------         ENDPROC       RECEIVE
-  -------         PROC          CRC_CHECK
-  C:0D4AH         LINE#         163
-  C:0D4AH         LINE#         164
-  C:0D53H         LINE#         165
-  C:0D5BH         LINE#         166
-  C:0D5FH         LINE#         167
-  C:0D71H         LINE#         168
-  C:0DD4H         LINE#         170
-  C:0DECH         LINE#         172
-  C:0E09H         LINE#         173
-  C:0E22H         LINE#         174
-  C:0E37H         LINE#         175
-  C:0E50H         LINE#         176
-  C:0E65H         LINE#         177
-  C:0E7EH         LINE#         178
-  C:0E93H         LINE#         180
-  C:0E97H         LINE#         181
-  C:0E99H         LINE#         183
-  C:0E9AH         LINE#         184
-  -------         ENDPROC       CRC_CHECK
-  -------         PROC          CRC_GENERATOR
-  C:10E7H         LINE#         186
-  C:10E7H         LINE#         187
-  C:10F0H         LINE#         188
-  C:10F8H         LINE#         189
-  C:10FCH         LINE#         191
-  C:1100H         LINE#         192
-  C:1176H         LINE#         194
-  C:118EH         LINE#         196
-  C:11A1H         LINE#         197
-  C:11BAH         LINE#         198
-  C:11D3H         LINE#         199
-  C:11DBH         LINE#         200
-  C:11E4H         LINE#         202
-  C:11EBH         LINE#         203
-  C:11F5H         LINE#         204
-  -------         ENDPROC       CRC_GENERATOR
-  -------         PROC          UART_INIT
-  C:144AH         LINE#         220
-  C:144AH         LINE#         221
-  C:144CH         LINE#         222
-  C:144EH         LINE#         223
-  C:1451H         LINE#         224
-  -------         ENDPROC       UART_INIT
-  -------         PROC          TIMER_INIT
-  C:1454H         LINE#         241
-  C:1454H         LINE#         242
-  C:1457H         LINE#         243
-  C:145AH         LINE#         245
-  C:145CH         LINE#         246
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 6
-
-
-  -------         ENDPROC       TIMER_INIT
-  -------         PROC          _UART_TX
-  D:0007H         SYMBOL        x
-  C:145DH         LINE#         262
-  C:145DH         LINE#         263
-  C:145FH         LINE#         264
-  C:1462H         LINE#         265
-  C:1464H         LINE#         266
-  -------         ENDPROC       _UART_TX
-  -------         PROC          UART_RX
-  -------         DO            
-  D:0007H         SYMBOL        z
-  -------         ENDDO         
-  C:1465H         LINE#         283
-  C:1465H         LINE#         286
-  C:1467H         LINE#         287
-  C:1469H         LINE#         288
-  C:1469H         LINE#         289
-  -------         ENDPROC       UART_RX
   -------         PROC          UART_ISR
-  C:13E0H         LINE#         294
-  C:13EDH         LINE#         295
-  C:13F0H         LINE#         296
-  C:13F2H         LINE#         297
-  C:13F5H         LINE#         298
-  C:13F7H         LINE#         299
-  C:13F7H         LINE#         300
+  -------         DO            
+  D:000FH         SYMBOL        c
+  -------         ENDDO         
+  C:08D6H         LINE#         118
+  C:08DDH         LINE#         121
+  C:08E0H         LINE#         122
+  C:08E2H         LINE#         123
+  C:08E4H         LINE#         124
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 4
+
+
+  C:08E7H         LINE#         125
+  C:08E9H         LINE#         126
+  C:08EEH         LINE#         127
+  C:08F0H         LINE#         128
+  C:08F6H         LINE#         129
+  C:08F8H         LINE#         130
+  C:08FDH         LINE#         131
+  C:0904H         LINE#         132
+  C:090CH         LINE#         133
+  C:090CH         LINE#         134
+  C:090CH         LINE#         136
+  C:090FH         LINE#         137
+  C:0911H         LINE#         138
+  C:0913H         LINE#         139
+  C:0913H         LINE#         140
   -------         ENDPROC       UART_ISR
+  -------         PROC          _SENDDATA
+  D:0007H         SYMBOL        dat
+  C:099DH         LINE#         147
+  C:099DH         LINE#         148
+  C:099DH         LINE#         149
+  C:09A0H         LINE#         150
+  C:09A2H         LINE#         151
+  C:09A4H         LINE#         152
+  -------         ENDPROC       _SENDDATA
+  -------         PROC          _SENDSTRING
+  D:0021H         SYMBOL        s
+  C:0918H         LINE#         159
+  C:091EH         LINE#         160
+  C:091EH         LINE#         161
+  C:0929H         LINE#         162
+  C:0929H         LINE#         163
+  C:093AH         LINE#         164
+  C:093CH         LINE#         165
+  -------         ENDPROC       _SENDSTRING
   -------         PROC          _DELAY
   D:0006H         SYMBOL        x
   -------         DO            
   D:0006H         SYMBOL        a
   D:0004H         SYMBOL        b
   -------         ENDDO         
-  C:1402H         LINE#         302
-  C:1402H         LINE#         305
-  C:140BH         LINE#         306
-  C:140FH         LINE#         307
-  C:140FH         LINE#         308
-  C:1418H         LINE#         309
-  C:141FH         LINE#         310
+  C:093DH         LINE#         167
+  C:093DH         LINE#         170
+  C:0946H         LINE#         171
+  C:094AH         LINE#         172
+  C:094AH         LINE#         173
+  C:0953H         LINE#         174
+  C:095AH         LINE#         175
   -------         ENDPROC       _DELAY
   -------         ENDMOD        CONTROL_BOX_FIRMWARE
 
-  -------         MODULE        ?C?FPADD
-  C:0807H         PUBLIC        ?C?FPADD
-  C:0803H         PUBLIC        ?C?FPSUB
-  -------         ENDMOD        ?C?FPADD
-
-  -------         MODULE        ?C?FPMUL
-  C:08F8H         PUBLIC        ?C?FPMUL
-  -------         ENDMOD        ?C?FPMUL
-
-  -------         MODULE        ?C?FCAST
-  C:0A08H         PUBLIC        ?C?FCASTC
-  C:0A03H         PUBLIC        ?C?FCASTI
-  C:09FEH         PUBLIC        ?C?FCASTL
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 7
-
-
-  -------         ENDMOD        ?C?FCAST
-
-  -------         MODULE        ?C?CASTF
-  C:0A3CH         PUBLIC        ?C?CASTF
-  -------         ENDMOD        ?C?CASTF
-
-  -------         MODULE        POW
-  D:0010H         PUBLIC        ?_pow?BYTE
-  C:0FD0H         PUBLIC        _pow
-  -------         ENDMOD        POW
-
-  -------         MODULE        ?C?CHKFLOAT
-  C:0ABDH         PUBLIC        ?C?CHKFLOAT
-  -------         ENDMOD        ?C?CHKFLOAT
-
-  -------         MODULE        ?C?FPCMP
-  C:0AD9H         PUBLIC        ?C?FPCMP
-  C:0AD7H         PUBLIC        ?C?FPCMP3
-  -------         ENDMOD        ?C?FPCMP
-
-  -------         MODULE        ?C?FPNEG
-  C:0B50H         PUBLIC        ?C?FPNEG
-  -------         ENDMOD        ?C?FPNEG
-
-  -------         MODULE        EXP
-  C:122EH         PUBLIC        _EXP
-  -------         ENDMOD        EXP
-
-  -------         MODULE        LOG
-  C:0ECFH         PUBLIC        _LOG
-  C:0ECBH         PUBLIC        _LOG10
-  -------         ENDMOD        LOG
-
-  -------         MODULE        ?C?FPDIV
-  C:0B64H         PUBLIC        ?C?FPDIV
-  -------         ENDMOD        ?C?FPDIV
-
-  -------         MODULE        ?C?SLDIV
-  C:131CH         PUBLIC        ?C?SLDIV
-  -------         ENDMOD        ?C?SLDIV
-
-  -------         MODULE        ?C?LNEG
-  C:0C4EH         PUBLIC        ?C?LNEG
-  -------         ENDMOD        ?C?LNEG
-
-  -------         MODULE        ?C?LLDCODE
-  C:0C5CH         PUBLIC        ?C?LLDCODE
-  -------         ENDMOD        ?C?LLDCODE
-
-  -------         MODULE        ?C?LLDCODE0
-  C:0C6CH         PUBLIC        ?C?LLDCODE0
-  -------         ENDMOD        ?C?LLDCODE0
-
-  -------         MODULE        ?C?ULDIV
-  C:0CB8H         PUBLIC        ?C?ULDIV
-  -------         ENDMOD        ?C?ULDIV
-
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  15:02:30  PAGE 8
-
-
-*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?IS_GOOD?CONTROL_BOX_FIRMWARE
-
-*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?CRC_GENERATOR?CONTROL_BOX_FIRMWARE
+  -------         MODULE        ?C?CLDPTR
+  C:0977H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
 
 ******************************************************************************
-* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 037BH BYTE (43%) *
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0111H BYTE (13%) *
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 5
+
+
 ******************************************************************************
 
-Program Size: data=96.1 xdata=0 code=3184
-LINK/LOCATE RUN COMPLETE.  2 WARNING(S),  0 ERROR(S)
+Program Size: data=34.3 xdata=0 code=427
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

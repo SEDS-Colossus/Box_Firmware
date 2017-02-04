@@ -1,9 +1,9 @@
-BL51 BANKED LINKER/LOCATER V6.22                                                        01/29/2017  13:09:41  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22                                                        02/04/2017  14:10:16  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
-C:\PROGRAM FILES\KEIL_C51\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\control_box_firmware.obj TO .\Objects\contro
->> l_box PRINT (.\Listings\control_box.m51) RAMSIZE (256)
+C:\PROGRAM FILES\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\control_box_firmware.obj TO .\Objects\control
+>> _box PRINT (.\Listings\control_box.m51) RAMSIZE (256)
 
 
 MEMORY MODEL: SMALL
@@ -12,7 +12,7 @@ MEMORY MODEL: SMALL
 INPUT MODULES INCLUDED:
   .\Objects\STARTUP.obj (?C_STARTUP)
   .\Objects\control_box_firmware.obj (CONTROL_BOX_FIRMWARE)
-  C:\PROGRAM FILES\KEIL_C51\C51\LIB\C51S.LIB (?C_INIT)
+  C:\PROGRAM FILES\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
 
 
 LINK MAP OF MODULE:  .\Objects\control_box (?C_STARTUP)
@@ -59,7 +59,7 @@ SEGMENT                                         DATA_GROUP
 
 
 
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  13:09:41  PAGE 2
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  14:10:16  PAGE 2
 
 
 SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
@@ -119,7 +119,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   C:0928H         PUBLIC        _delay
   C:0946H         PUBLIC        leds_update
   D:00B8H         PUBLIC        IP
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  13:09:41  PAGE 3
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  14:10:16  PAGE 3
 
 
   D:0026H         PUBLIC        DIVISOR
@@ -179,7 +179,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   C:0958H         LINE#         213
   C:095DH         LINE#         214
   -------         ENDPROC       BUTTON_CHECK
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  13:09:41  PAGE 4
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  14:10:16  PAGE 4
 
 
   -------         PROC          BUTTONPRESS
@@ -239,7 +239,7 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?TIMER_INIT?CONTROL_BOX_FIRMWARE
 
-BL51 BANKED LINKER/LOCATER V6.22                                                      01/29/2017  13:09:41  PAGE 5
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  14:10:16  PAGE 5
 
 
 ******************************************************************************
