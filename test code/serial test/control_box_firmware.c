@@ -71,8 +71,8 @@ sbit LED11 = P4^4;
 /* article, please specify in which data and procedures from STC    */
 /*------------------------------------------------------------------*/
 
-typedef unsigned char BYTE;
-typedef unsigned int WORD;
+//typedef unsigned char BYTE;
+//typedef unsigned int WORD;
 
 //#define FOSC 11059200L      //System frequency
 //#define BAUD 9600           //UART baudrate
@@ -81,15 +81,15 @@ typedef unsigned int WORD;
 
 bit busy;
 
-void SendData(BYTE dat);
-void SendString(char *s);
+void SendData(unsigned char dat);
+void SendString(unsigned char *s);
 void delay(unsigned int x);
 
 unsigned char input[10]; //stores all recieved inputs
 int i = 0;
 int index = 0;
 bit storing = 0;
-bit dataChanged = 1;
+bit inputChanged = 1;
 
 void main()
 {
@@ -102,12 +102,11 @@ void main()
   TR1 = 1;    					  		//Timer 1 enable
   ES = 1;                 		//Enable UART interrupt
   EA = 1;                 		//Open master interrupt switch
-	SendString("STC12C5A60S2\r\nUart Test !\r\n");
   while(1){
 		delay(500);
-		if(dataChanged) { //data has been changed
+		if(inputChanged) { //data has been changed
 			SendString(input); //send the data
-			dataChanged = 0; //resest dataB;
+			inputChanged = 0; //resest dataB;
 		}
 	}
 }
@@ -123,20 +122,22 @@ void Uart_Isr() interrupt 4 using 1
 	  c = SBUF; //store buffer in c
 		if(c == STARTKEY) { //start key is received
 			storing = 1; //set that we are now storing
-		} else if(c == ENDKEY) { //end key is received
-			storing = 0; //set that we are done storing
-			index = 0; //reset index
-			dataChanged = 1;
+			index = 0; //start from beginning of array
 		} else if(storing) { //we are in storing mode
 			input[index] = c; //store SBUF in current index of array
 			++index; //increment array index
 		}
+		if(index >= 10) { //read in enough values
+			storing = 0; //set that we are done storing
+			index = 0; //reset index
+			inputChanged = 1; //tell the program that new data has been delivered
+		}
 	}
 		
-    if(TI) { //transmit flagged
-			TI = 0; //Clear transmit interrupt flag
-			busy = 0; //Clear transmit busy flag
-    }
+	if(TI) { //transmit flagged
+		TI = 0; //Clear transmit interrupt flag
+		busy = 0; //Clear transmit busy flag
+	}
 }
 
 /*----------------------------
@@ -144,7 +145,7 @@ Send a byte data to UART
 Input: dat (data to be sent)
 Output:None
 ----------------------------*/
-void SendData(BYTE dat)
+void SendData(unsigned char dat)
 {
     while (busy);           	//Wait for the completion of the previous data is sent
     busy = 1;
@@ -156,7 +157,7 @@ Send a string to UART
 Input: s (address of string)
 Output:None
 ----------------------------*/
-void SendString(char *s)
+void SendString(unsigned char *s)
 {
     while (*s)              //Check the end of the string
     {

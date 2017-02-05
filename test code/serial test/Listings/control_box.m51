@@ -1,4 +1,4 @@
-BL51 BANKED LINKER/LOCATER V6.22                                                        02/04/2017  15:23:52  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22                                                        02/04/2017  20:33:32  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
@@ -38,14 +38,13 @@ LINK MAP OF MODULE:  .\Objects\control_box (?C_STARTUP)
             CODE    0023H     0003H     ABSOLUTE     
                     0026H     07DAH                  *** GAP ***
             CODE    0800H     008CH     UNIT         ?C_C51STARTUP
-            CODE    088CH     004AH     UNIT         ?PR?MAIN?CONTROL_BOX_FIRMWARE
-            CODE    08D6H     0042H     UNIT         ?PR?UART_ISR?CONTROL_BOX_FIRMWARE
-            CODE    0918H     0025H     UNIT         ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE
-            CODE    093DH     001EH     UNIT         ?PR?_DELAY?CONTROL_BOX_FIRMWARE
-            CODE    095BH     001CH     UNIT         ?CO?CONTROL_BOX_FIRMWARE
-            CODE    0977H     0019H     UNIT         ?C?LIB_CODE
-            CODE    0990H     000DH     UNIT         ?C_INITSEG
-            CODE    099DH     0008H     UNIT         ?PR?_SENDDATA?CONTROL_BOX_FIRMWARE
+            CODE    088CH     0050H     UNIT         ?PR?UART_ISR?CONTROL_BOX_FIRMWARE
+            CODE    08DCH     0041H     UNIT         ?PR?MAIN?CONTROL_BOX_FIRMWARE
+            CODE    091DH     0025H     UNIT         ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE
+            CODE    0942H     001EH     UNIT         ?PR?_DELAY?CONTROL_BOX_FIRMWARE
+            CODE    0960H     0019H     UNIT         ?C?LIB_CODE
+            CODE    0979H     000DH     UNIT         ?C_INITSEG
+            CODE    0986H     0008H     UNIT         ?PR?_SENDDATA?CONTROL_BOX_FIRMWARE
 
 
 
@@ -59,13 +58,12 @@ SEGMENT                                        DATA_GROUP
   +--> ?PR?MAIN?CONTROL_BOX_FIRMWARE
   +--> ?C_INITSEG
 
-BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 2
-
-
 ?PR?MAIN?CONTROL_BOX_FIRMWARE                -----    -----
-  +--> ?CO?CONTROL_BOX_FIRMWARE
-  +--> ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  20:33:32  PAGE 2
+
+
   +--> ?PR?_DELAY?CONTROL_BOX_FIRMWARE
+  +--> ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE
 
 ?PR?_SENDSTRING?CONTROL_BOX_FIRMWARE         0021H    0003H
   +--> ?PR?_SENDDATA?CONTROL_BOX_FIRMWARE
@@ -119,103 +117,104 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   D:00B0H         PUBLIC        P3
   D:00C0H         PUBLIC        P4
   D:00C8H         PUBLIC        P5
-BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 3
-
-
   B:00A8H.7       PUBLIC        EA
   D:00E8H         PUBLIC        P6
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  20:33:32  PAGE 3
+
+
   D:00F8H         PUBLIC        P7
-  C:0918H         PUBLIC        _SendString
-  C:099DH         PUBLIC        _SendData
+  C:091DH         PUBLIC        _SendString
+  C:0986H         PUBLIC        _SendData
   B:0020H.0       PUBLIC        storing
   D:00A8H         PUBLIC        IE
-  C:093DH         PUBLIC        _delay
+  C:0942H         PUBLIC        _delay
   B:00A8H.4       PUBLIC        ES
   D:00B8H         PUBLIC        IP
   D:0010H         PUBLIC        index
   B:0098H.0       PUBLIC        RI
   B:0098H.1       PUBLIC        TI
   D:00D8H         PUBLIC        CCON
-  C:088CH         PUBLIC        main
-  C:08D6H         PUBLIC        Uart_Isr
+  C:08DCH         PUBLIC        main
+  C:088CH         PUBLIC        Uart_Isr
   D:0099H         PUBLIC        SBUF
   D:0012H         PUBLIC        input
   D:0098H         PUBLIC        SCON
   D:0089H         PUBLIC        TMOD
   D:0088H         PUBLIC        TCON
   B:0020H.1       PUBLIC        busy
-  B:0020H.2       PUBLIC        dataChanged
   D:008DH         PUBLIC        TH1
   B:0088H.6       PUBLIC        TR1
+  B:0020H.2       PUBLIC        inputChanged
   D:001CH         PUBLIC        i
   D:00D0H         PUBLIC        PSW
   -------         PROC          MAIN
-  C:088CH         LINE#         94
-  C:088CH         LINE#         95
-  C:088CH         LINE#         96
-  C:0891H         LINE#         97
-  C:0899H         LINE#         98
-  C:08A7H         LINE#         99
-  C:08AAH         LINE#         100
-  C:08ADH         LINE#         101
-  C:08B0H         LINE#         102
-  C:08B2H         LINE#         103
-  C:08B4H         LINE#         104
-  C:08B6H         LINE#         105
-  C:08BFH         LINE#         106
-  C:08BFH         LINE#         107
-  C:08C6H         LINE#         108
-  C:08C9H         LINE#         109
-  C:08D2H         LINE#         110
-  C:08D4H         LINE#         111
-  C:08D4H         LINE#         112
+  C:08DCH         LINE#         94
+  C:08DCH         LINE#         95
+  C:08DCH         LINE#         96
+  C:08E1H         LINE#         97
+  C:08E9H         LINE#         98
+  C:08F7H         LINE#         99
+  C:08FAH         LINE#         100
+  C:08FDH         LINE#         101
+  C:0900H         LINE#         102
+  C:0902H         LINE#         103
+  C:0904H         LINE#         104
+  C:0906H         LINE#         105
+  C:0906H         LINE#         106
+  C:090DH         LINE#         107
+  C:0910H         LINE#         108
+  C:0919H         LINE#         109
+  C:091BH         LINE#         110
+  C:091BH         LINE#         111
   -------         ENDPROC       MAIN
   -------         PROC          UART_ISR
   -------         DO            
   D:000FH         SYMBOL        c
   -------         ENDDO         
-  C:08D6H         LINE#         118
-  C:08DDH         LINE#         121
-  C:08E0H         LINE#         122
-  C:08E2H         LINE#         123
-  C:08E4H         LINE#         124
-BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 4
+  C:088CH         LINE#         117
+  C:0893H         LINE#         120
+  C:0896H         LINE#         121
+  C:0898H         LINE#         122
+  C:089AH         LINE#         123
+  C:089DH         LINE#         124
+  C:089FH         LINE#         125
+  C:08A5H         LINE#         126
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  20:33:32  PAGE 4
 
 
-  C:08E7H         LINE#         125
-  C:08E9H         LINE#         126
-  C:08EEH         LINE#         127
-  C:08F0H         LINE#         128
-  C:08F6H         LINE#         129
-  C:08F8H         LINE#         130
-  C:08FDH         LINE#         131
-  C:0904H         LINE#         132
-  C:090CH         LINE#         133
-  C:090CH         LINE#         134
-  C:090CH         LINE#         136
-  C:090FH         LINE#         137
-  C:0911H         LINE#         138
-  C:0913H         LINE#         139
-  C:0913H         LINE#         140
+  C:08AAH         LINE#         127
+  C:08B1H         LINE#         128
+  C:08B9H         LINE#         129
+  C:08B9H         LINE#         130
+  C:08C6H         LINE#         131
+  C:08C8H         LINE#         132
+  C:08CEH         LINE#         133
+  C:08D0H         LINE#         134
+  C:08D0H         LINE#         135
+  C:08D0H         LINE#         137
+  C:08D3H         LINE#         138
+  C:08D5H         LINE#         139
+  C:08D7H         LINE#         140
+  C:08D7H         LINE#         141
   -------         ENDPROC       UART_ISR
   -------         PROC          _SENDDATA
   D:0007H         SYMBOL        dat
-  C:099DH         LINE#         147
-  C:099DH         LINE#         148
-  C:099DH         LINE#         149
-  C:09A0H         LINE#         150
-  C:09A2H         LINE#         151
-  C:09A4H         LINE#         152
+  C:0986H         LINE#         148
+  C:0986H         LINE#         149
+  C:0986H         LINE#         150
+  C:0989H         LINE#         151
+  C:098BH         LINE#         152
+  C:098DH         LINE#         153
   -------         ENDPROC       _SENDDATA
   -------         PROC          _SENDSTRING
   D:0021H         SYMBOL        s
-  C:0918H         LINE#         159
-  C:091EH         LINE#         160
-  C:091EH         LINE#         161
-  C:0929H         LINE#         162
-  C:0929H         LINE#         163
-  C:093AH         LINE#         164
-  C:093CH         LINE#         165
+  C:091DH         LINE#         160
+  C:0923H         LINE#         161
+  C:0923H         LINE#         162
+  C:092EH         LINE#         163
+  C:092EH         LINE#         164
+  C:093FH         LINE#         165
+  C:0941H         LINE#         166
   -------         ENDPROC       _SENDSTRING
   -------         PROC          _DELAY
   D:0006H         SYMBOL        x
@@ -223,26 +222,26 @@ SYMBOL TABLE OF MODULE:  .\Objects\control_box (?C_STARTUP)
   D:0006H         SYMBOL        a
   D:0004H         SYMBOL        b
   -------         ENDDO         
-  C:093DH         LINE#         167
-  C:093DH         LINE#         170
-  C:0946H         LINE#         171
-  C:094AH         LINE#         172
-  C:094AH         LINE#         173
-  C:0953H         LINE#         174
-  C:095AH         LINE#         175
+  C:0942H         LINE#         168
+  C:0942H         LINE#         171
+  C:094BH         LINE#         172
+  C:094FH         LINE#         173
+  C:094FH         LINE#         174
+  C:0958H         LINE#         175
+  C:095FH         LINE#         176
   -------         ENDPROC       _DELAY
   -------         ENDMOD        CONTROL_BOX_FIRMWARE
 
   -------         MODULE        ?C?CLDPTR
-  C:0977H         PUBLIC        ?C?CLDPTR
+  C:0960H         PUBLIC        ?C?CLDPTR
   -------         ENDMOD        ?C?CLDPTR
 
 ******************************************************************************
-* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0111H BYTE (13%) *
-BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  15:23:52  PAGE 5
-
-
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00FAH BYTE (12%) *
 ******************************************************************************
+BL51 BANKED LINKER/LOCATER V6.22                                                      02/04/2017  20:33:32  PAGE 5
 
-Program Size: data=34.3 xdata=0 code=427
+
+
+Program Size: data=34.3 xdata=0 code=404
 LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

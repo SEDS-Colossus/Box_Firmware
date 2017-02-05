@@ -1,4 +1,4 @@
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 1   
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 1   
 
 
 C51 COMPILER V9.56.0.0, COMPILATION OF MODULE CONTROL_BOX_FIRMWARE
@@ -62,7 +62,7 @@ line level    source
   52          sbit LED8 = P0^7;
   53          
   54          /*************************************************************************
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 2   
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 2   
 
   55           *                                   --PROTOTYPES--
   56           *************************************************************************/
@@ -120,344 +120,348 @@ line level    source
  108           *  @RETURN: none
  109           *************************************************************************/
  110          void main() {
- 111   1        P4SW = 0x70;
- 112   1        
+ 111   1        unsigned char LED10C = 0;
+ 112   1        P4SW = 0x70;
  113   1        while(1) {
- 114   2          unsigned int count10 = 0;
+ 114   2          unsigned int count = 0;
  115   2          if(sw10 == 0) { //pressed initially
- 116   3            while(sw10 == 0) ++count10; //hold
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 3   
+ 116   3            while(sw10 == 0) ++count; //hold
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 3   
 
- 117   3            if(count10 > 10) //held long enough
+ 117   3            if(count > 10) //held long enough
  118   3              sw10B = !sw10B; //switch
- 119   3          }
- 120   2          
- 121   2        /*
- 122   2        
- 123   2        while(1) {
- 124   2          if(sw10 == 0) { //initially pressed
- 125   2            //TODO: timer starts
- 126   2            if(sw10 == 1) { //unpressed
- 127   2              LED10 = 1; //turn off led
- 128   2            else if(sw10 == 0) { //still pressed
- 129   2              sw10B = !sw10B;
- 130   2            }
- 131   2          }
- 132   2          
- 133   2          /*
- 134   2          while(sw10 == 0) {
- 135   2            count10++;
- 136   2            if(count10 > 50) {
- 137   2              sw10B = !sw10B;
- 138   2            }
- 139   2          } */
- 140   2          delay(300);
- 141   2          LED10 = !sw10B;
- 142   2          //delay(10);
- 143   2        }
- 144   1      }
- 145          
- 146          void delay(unsigned int x) {
- 147   1        unsigned int a;
- 148   1        unsigned int b;
- 149   1        for(a=x;a>0;a--) {
- 150   2          for(b=1000;b>0;b--) {
- 151   3            continue;
- 152   3          }
- 153   2        }
- 154   1      }
- 155          
- 156          /*************************************************************************
- 157           *                          --IS_GOOD--
- 158           *  @Descption:
- 159           *
- 160           *  @PRECONDITION:
- 161           *
- 162           *  @POSTCONDITION: checks if an the connection is good
- 163           *                                 between the two UARTS
- 164           *
- 165           *  @PARAMETER: none
- 166           *
- 167           *  @RETURN: int
- 168           *************************************************************************/
- 169          /*
- 170          bit is_good() {
- 171            uart_tx('g');
- 172            if(uart_rx() == 'g')
- 173              return 1;
- 174            else
- 175              return 0;
- 176          }
- 177          
- 178          bit receive() {
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 4   
+ 119   3            LED10 = !sw10B; //set led state
+ 120   3          }
+ 121   2          
+ 122   2          delay(50);
+ 123   2          if(sw10B && (LED10C++ > 4)) {
+ 124   3            LED10C = 0;
+ 125   3            LED10 = !LED10;
+ 126   3          }
+ 127   2        /*
+ 128   2        
+ 129   2        while(1) {
+ 130   2          if(sw10 == 0) { //initially pressed
+ 131   2            //TODO: timer starts
+ 132   2            if(sw10 == 1) { //unpressed
+ 133   2              LED10 = 1; //turn off led
+ 134   2            else if(sw10 == 0) { //still pressed
+ 135   2              sw10B = !sw10B;
+ 136   2            }
+ 137   2          }
+ 138   2          
+ 139   2          /*
+ 140   2          while(sw10 == 0) {
+ 141   2            count10++;
+ 142   2            if(count10 > 50) {
+ 143   2              sw10B = !sw10B;
+ 144   2            }
+ 145   2          } */
+ 146   2          
+ 147   2        }
+ 148   1      }
+ 149          
+ 150          void delay(unsigned int x) {
+ 151   1        unsigned int a;
+ 152   1        unsigned int b;
+ 153   1        for(a=x;a>0;a--) {
+ 154   2          for(b=1000;b>0;b--) {
+ 155   3            continue;
+ 156   3          }
+ 157   2        }
+ 158   1      }
+ 159          
+ 160          /*************************************************************************
+ 161           *                          --IS_GOOD--
+ 162           *  @Descption:
+ 163           *
+ 164           *  @PRECONDITION:
+ 165           *
+ 166           *  @POSTCONDITION: checks if an the connection is good
+ 167           *                                 between the two UARTS
+ 168           *
+ 169           *  @PARAMETER: none
+ 170           *
+ 171           *  @RETURN: int
+ 172           *************************************************************************/
+ 173          /*
+ 174          bit is_good() {
+ 175            uart_tx('g');
+ 176            if(uart_rx() == 'g')
+ 177              return 1;
+ 178            else
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 4   
 
- 179               //the number of bits you add to the input is one less than the divisor
- 180               for(i = 0; i < IN_COUNT; ++i) { //start input loop
- 181                    input[i] = uart_rx();
- 182               } //end input loop
- 183               if(CRC_check()) //convert input to hex to save space -- this is stored in the global hex array
- 184                    return 1;
- 185               else
- 186                    return 0;
- 187          }
- 188          
- 189          bit CRC_check(){
- 190               xor_value = 0x0;
- 191               crc = 0x0;
- 192               remainder = 0;
- 193               for(i = 0; i != 30; i++);
- 194                    crc = crc + (int)input[i]*pow(2,i);
- 195          
- 196               xor_value = crc ^ DIVISOR;
- 197          
- 198               remainder =  remainder + (xor_value % 2);
- 199               xor_value = xor_value/2;
- 200               remainder =  remainder + (xor_value % 2);
- 201               xor_value = xor_value/2;
+ 179              return 0;
+ 180          }
+ 181          
+ 182          bit receive() {
+ 183               //the number of bits you add to the input is one less than the divisor
+ 184               for(i = 0; i < IN_COUNT; ++i) { //start input loop
+ 185                    input[i] = uart_rx();
+ 186               } //end input loop
+ 187               if(CRC_check()) //convert input to hex to save space -- this is stored in the global hex array
+ 188                    return 1;
+ 189               else
+ 190                    return 0;
+ 191          }
+ 192          
+ 193          bit CRC_check(){
+ 194               xor_value = 0x0;
+ 195               crc = 0x0;
+ 196               remainder = 0;
+ 197               for(i = 0; i != 30; i++);
+ 198                    crc = crc + (int)input[i]*pow(2,i);
+ 199          
+ 200               xor_value = crc ^ DIVISOR;
+ 201          
  202               remainder =  remainder + (xor_value % 2);
  203               xor_value = xor_value/2;
  204               remainder =  remainder + (xor_value % 2);
- 205          
- 206               if(remainder == 0)
- 207                    return 1;
- 208               else
- 209                    return 0;
- 210          }
- 211          */
- 212          void button_check() { //change this to what I have in peters board
- 213   1        sw10B = ButtonPress();
- 214   1      }
- 215          
- 216          bit ButtonPress()
- 217          {
- 218   1          static unsigned int buttonState = 0;
- 219   1          static char buttonPressEnabled = 1;
- 220   1      
- 221   1          if(!sw10)
- 222   1          {
- 223   2              if(buttonState < BUTTON_DEBOUNCE_CHECKS)
- 224   2              {
- 225   3                  buttonState++;
- 226   3              }
- 227   2              else if(buttonPressEnabled)
+ 205               xor_value = xor_value/2;
+ 206               remainder =  remainder + (xor_value % 2);
+ 207               xor_value = xor_value/2;
+ 208               remainder =  remainder + (xor_value % 2);
+ 209          
+ 210               if(remainder == 0)
+ 211                    return 1;
+ 212               else
+ 213                    return 0;
+ 214          }
+ 215          */
+ 216          void button_check() { //change this to what I have in peters board
+ 217   1        sw10B = ButtonPress();
+ 218   1      }
+ 219          
+ 220          bit ButtonPress()
+ 221          {
+ 222   1          static unsigned int buttonState = 0;
+ 223   1          static char buttonPressEnabled = 1;
+ 224   1      
+ 225   1          if(!sw10)
+ 226   1          {
+ 227   2              if(buttonState < BUTTON_DEBOUNCE_CHECKS)
  228   2              {
- 229   3                  buttonPressEnabled = 0;
- 230   3                  return 1;
- 231   3              }
- 232   2          }
- 233   1          else if(buttonState > 0 )
- 234   1          {
- 235   2              buttonState--;
- 236   2              // alternatively you can set buttonState to 0 here, but I prefer this way
- 237   2          }
- 238   1          else
- 239   1          {
- 240   2              buttonPressEnabled = 1;
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 5   
+ 229   3                  buttonState++;
+ 230   3              }
+ 231   2              else if(buttonPressEnabled)
+ 232   2              {
+ 233   3                  buttonPressEnabled = 0;
+ 234   3                  return 1;
+ 235   3              }
+ 236   2          }
+ 237   1          else if(buttonState > 0 )
+ 238   1          {
+ 239   2              buttonState--;
+ 240   2              // alternatively you can set buttonState to 0 here, but I prefer this way
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 5   
 
  241   2          }
- 242   1      
- 243   1          return 0;
- 244   1      }
- 245          
- 246          void leds_update() {
- 247   1        if(sw10B == 1) {
- 248   2          LED10 = 1;
- 249   2        }
- 250   1        else {
- 251   2          LED10 = 0;
- 252   2        }
- 253   1      }
- 254          
- 255          /*
- 256          void verify_states() {
- 257                  //solinoids are off -- LEDS are inverted. 1 == off, 0 == on
- 258                  if(input[1] == '1' && input[14] == '0') //SW1
- 259                    p0_0 = 1;
- 260                  if(input[2] == '1' && input[15] == '0') //SW2
- 261                    p0_1 = 1;
- 262                  if(input[3] == '1' && input[16] == '0') //SW3
- 263                    p0_2 = 1;
- 264                  if(input[4] == '1' && input[17] == '0') //SW4
- 265                    p0_3 = 1;
- 266                  if(input[5] == '1' && input[18] == '0') //SW5
- 267                    p0_4 = 1;
- 268                  if(input[6] == '1' && input[19] == '0') //SW6
- 269                    p0_5 = 1;
- 270                  if(input[7] == '1' && input[20] == '0') //SW7
- 271                    p0_6 = 1;
- 272                  if(input[8] == '1' && input[21] == '0') //SW8
- 273                    p0_7 = 1;
- 274                  if(input[9] == '1' && input[22] == '0') //SW9
- 275                    p4_6 = 1;
- 276                  if(input[10] == '1' && input[23] == '0') //SW10
- 277                    p4_5 = 1;
- 278                  if(input[11] == '1' && input[24] == '0') //SW11
- 279                    p4_4 = 1;
- 280                  if(input[12] == '1' && input[25] == '0') //SW11
- 281                    p2_7 = 1;
- 282          
- 283                  //if solinoids are on
- 284                  if((input[1] == '1' || input[1] == '0') && input[14] == '1')
- 285                    p0_1 = 0;
- 286                  if((input[2] == '1' || input[2] == '0') && input[15] == '1')
- 287                    p0_2 = 0;
- 288                  if((input[3] == '1' || input[3] == '0') && input[16] == '1')
- 289                    p0_3 = 0;
- 290                  if((input[4] == '1' || input[4] == '0') && input[17] == '1')
- 291                    p0_4 = 0;
- 292                  if((input[5] == '1' || input[5] == '0') && input[18] == '1')
- 293                    p0_5 = 0;
- 294                  if((input[6] == '1' || input[6] == '0') && input[19] == '1')
- 295                    p0_6 = 0;
- 296                  if((input[7] == '1' || input[7] == '0') && input[20] == '1')
- 297                    p0_7 = 0;
- 298                  if((input[8] == '1' || input[8] == '0') && input[21] == '1')
- 299                    p4_6 = 0;
- 300                  if((input[9] == '1' || input[9] == '0') && input[22] == '1')
- 301                    p4_5 = 0;
- 302                  if((input[10] == '1' || input[10] == '0') && input[23] == '1')
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 6   
+ 242   1          else
+ 243   1          {
+ 244   2              buttonPressEnabled = 1;
+ 245   2          }
+ 246   1      
+ 247   1          return 0;
+ 248   1      }
+ 249          
+ 250          void leds_update() {
+ 251   1        if(sw10B == 1) {
+ 252   2          LED10 = 1;
+ 253   2        }
+ 254   1        else {
+ 255   2          LED10 = 0;
+ 256   2        }
+ 257   1      }
+ 258          
+ 259          /*
+ 260          void verify_states() {
+ 261                  //solinoids are off -- LEDS are inverted. 1 == off, 0 == on
+ 262                  if(input[1] == '1' && input[14] == '0') //SW1
+ 263                    p0_0 = 1;
+ 264                  if(input[2] == '1' && input[15] == '0') //SW2
+ 265                    p0_1 = 1;
+ 266                  if(input[3] == '1' && input[16] == '0') //SW3
+ 267                    p0_2 = 1;
+ 268                  if(input[4] == '1' && input[17] == '0') //SW4
+ 269                    p0_3 = 1;
+ 270                  if(input[5] == '1' && input[18] == '0') //SW5
+ 271                    p0_4 = 1;
+ 272                  if(input[6] == '1' && input[19] == '0') //SW6
+ 273                    p0_5 = 1;
+ 274                  if(input[7] == '1' && input[20] == '0') //SW7
+ 275                    p0_6 = 1;
+ 276                  if(input[8] == '1' && input[21] == '0') //SW8
+ 277                    p0_7 = 1;
+ 278                  if(input[9] == '1' && input[22] == '0') //SW9
+ 279                    p4_6 = 1;
+ 280                  if(input[10] == '1' && input[23] == '0') //SW10
+ 281                    p4_5 = 1;
+ 282                  if(input[11] == '1' && input[24] == '0') //SW11
+ 283                    p4_4 = 1;
+ 284                  if(input[12] == '1' && input[25] == '0') //SW11
+ 285                    p2_7 = 1;
+ 286          
+ 287                  //if solinoids are on
+ 288                  if((input[1] == '1' || input[1] == '0') && input[14] == '1')
+ 289                    p0_1 = 0;
+ 290                  if((input[2] == '1' || input[2] == '0') && input[15] == '1')
+ 291                    p0_2 = 0;
+ 292                  if((input[3] == '1' || input[3] == '0') && input[16] == '1')
+ 293                    p0_3 = 0;
+ 294                  if((input[4] == '1' || input[4] == '0') && input[17] == '1')
+ 295                    p0_4 = 0;
+ 296                  if((input[5] == '1' || input[5] == '0') && input[18] == '1')
+ 297                    p0_5 = 0;
+ 298                  if((input[6] == '1' || input[6] == '0') && input[19] == '1')
+ 299                    p0_6 = 0;
+ 300                  if((input[7] == '1' || input[7] == '0') && input[20] == '1')
+ 301                    p0_7 = 0;
+ 302                  if((input[8] == '1' || input[8] == '0') && input[21] == '1')
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 6   
 
- 303                    p4_4 = 0;
- 304                  if((input[11] == '1' || input[11] == '0') && input[24] == '1')
- 305                    p2_7 = 0;
- 306                  if((input[12] == '1' || input[12] == '0') && input[25] == '1')
- 307                    p2_2 = 0;
- 308          }
- 309          
- 310          void CRC_generator() {
- 311               xor_value = 0x0;
- 312               crc = 0x0;
- 313               remainder = 0;
- 314               i = 0;
- 315          
- 316               for(i = 0; i != 18; i++)
- 317                    crc = crc + (int)send[i]*pow(2,i);
- 318          
- 319               xor_value = crc ^ DIVISOR;
- 320          
- 321               for(i = 18; i != 15; i--) { // may need to be i != 14. Check through testing
- 322                    remainder = xor_value %2;
- 323                    xor_value = xor_value/2;
- 324                    if (remainder == 1)
- 325                         send[i] = '1';
- 326                    else
- 327                         send[i] = '0';
- 328               }
- 329          }
- 330          
- 331          void send() {
- 332               i = 0;
- 333               while (i != 18) {
- 334                    uart_tx(send[i]);
- 335                    i++;
- 336               }
- 337          }
- 338          
- 339          void print_errors() {
- 340            //TODO: print erros to screen
+ 303                    p4_6 = 0;
+ 304                  if((input[9] == '1' || input[9] == '0') && input[22] == '1')
+ 305                    p4_5 = 0;
+ 306                  if((input[10] == '1' || input[10] == '0') && input[23] == '1')
+ 307                    p4_4 = 0;
+ 308                  if((input[11] == '1' || input[11] == '0') && input[24] == '1')
+ 309                    p2_7 = 0;
+ 310                  if((input[12] == '1' || input[12] == '0') && input[25] == '1')
+ 311                    p2_2 = 0;
+ 312          }
+ 313          
+ 314          void CRC_generator() {
+ 315               xor_value = 0x0;
+ 316               crc = 0x0;
+ 317               remainder = 0;
+ 318               i = 0;
+ 319          
+ 320               for(i = 0; i != 18; i++)
+ 321                    crc = crc + (int)send[i]*pow(2,i);
+ 322          
+ 323               xor_value = crc ^ DIVISOR;
+ 324          
+ 325               for(i = 18; i != 15; i--) { // may need to be i != 14. Check through testing
+ 326                    remainder = xor_value %2;
+ 327                    xor_value = xor_value/2;
+ 328                    if (remainder == 1)
+ 329                         send[i] = '1';
+ 330                    else
+ 331                         send[i] = '0';
+ 332               }
+ 333          }
+ 334          
+ 335          void send() {
+ 336               i = 0;
+ 337               while (i != 18) {
+ 338                    uart_tx(send[i]);
+ 339                    i++;
+ 340               }
  341          }
- 342          */
- 343          /*************************************************************************
- 344           *                             -- UART INITIALIZATION --
- 345           *  @Descption: First thing called from the main function. This will
- 346           *              instantiate the uart
- 347           *
- 348           *  @PRECONDITION: main() is called
- 349           *
- 350           *  @POSTCONDITION: Data is set to 8 bit length and baud rate set to
- 351           *                  9600 baud.
- 352           *
- 353           *  @PARAMETER: none
- 354           *
- 355           *  @RETURN: none
- 356           *************************************************************************/
- 357           /*
- 358          void uart_init() {
- 359            SCON = 0x50;  //Setting data as 8bit and receive enable
- 360            timer_init(); //baud rate is 9600
- 361          }
- 362          */
- 363          /*************************************************************************
- 364           *                       -- TIMER INITIALIZATION --
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 7   
+ 342          
+ 343          void print_errors() {
+ 344            //TODO: print erros to screen
+ 345          }
+ 346          */
+ 347          /*************************************************************************
+ 348           *                             -- UART INITIALIZATION --
+ 349           *  @Descption: First thing called from the main function. This will
+ 350           *              instantiate the uart
+ 351           *
+ 352           *  @PRECONDITION: main() is called
+ 353           *
+ 354           *  @POSTCONDITION: Data is set to 8 bit length and baud rate set to
+ 355           *                  9600 baud.
+ 356           *
+ 357           *  @PARAMETER: none
+ 358           *
+ 359           *  @RETURN: none
+ 360           *************************************************************************/
+ 361           /*
+ 362          void uart_init() {
+ 363            SCON = 0x50;  //Setting data as 8bit and receive enable
+ 364            timer_init(); //baud rate is 9600
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 7   
 
- 365           *  @Descption: Timers will be set correct for the 8051 architecure. These
- 366           *              timers set the reload mode for filling the buffer with
- 367           *              messages to be sent.
- 368           *
- 369           *  @PRECONDITION: uart_init() is called
- 370           *
- 371           *  @POSTCONDITION: timers are set for correct reading bit lengths
+ 365          }
+ 366          */
+ 367          /*************************************************************************
+ 368           *                       -- TIMER INITIALIZATION --
+ 369           *  @Descption: Timers will be set correct for the 8051 architecure. These
+ 370           *              timers set the reload mode for filling the buffer with
+ 371           *              messages to be sent.
  372           *
- 373           *  @PARAMETER: none
+ 373           *  @PRECONDITION: uart_init() is called
  374           *
- 375           *  @RETURN: none
- 376           *************************************************************************/
- 377          void timer_init() {
- 378   1        TMOD = 0x20; //timer 1 in mode 2 i.e. auto reload mode
- 379   1        TH1 = 0xFD;  //reload value is FD for 9600 baud rate
- 380   1                     //(Found in table in READ_Me file)
- 381   1        TR1 = 1;     //Timer 1 enable
- 382   1      }
- 383          
- 384          /*************************************************************************
- 385           *                       -- UART TRANSMITION --
- 386           *  @Descption: Sends values to other device using uart transmition.
- 387           *              Sends the single char value to the buffer and sends the
- 388           *              char in 8 bits.
- 389           *
- 390           *  @PRECONDITION: called from main() from within main while loop
- 391           *
- 392           *  @POSTCONDITION: individual message will be sent as one char
+ 375           *  @POSTCONDITION: timers are set for correct reading bit lengths
+ 376           *
+ 377           *  @PARAMETER: none
+ 378           *
+ 379           *  @RETURN: none
+ 380           *************************************************************************/
+ 381          void timer_init() {
+ 382   1        TMOD = 0x20; //timer 1 in mode 2 i.e. auto reload mode
+ 383   1        TH1 = 0xFD;  //reload value is FD for 9600 baud rate
+ 384   1                     //(Found in table in READ_Me file)
+ 385   1        TR1 = 1;     //Timer 1 enable
+ 386   1      }
+ 387          
+ 388          /*************************************************************************
+ 389           *                       -- UART TRANSMITION --
+ 390           *  @Descption: Sends values to other device using uart transmition.
+ 391           *              Sends the single char value to the buffer and sends the
+ 392           *              char in 8 bits.
  393           *
- 394           *  @PARAMETER: unsigned char
+ 394           *  @PRECONDITION: called from main() from within main while loop
  395           *
- 396           *  @RETURN: none
- 397           *************************************************************************/
- 398          /*
- 399          void uart_tx(unsigned char x) {
- 400            SBUF = x;   //Load data to serial buffer register associated to UART
- 401            while(!TI); //transmit flag change when MSB is sent
- 402            TI=0;       //clear the transmit flag
- 403          }
- 404          */
- 405          /*************************************************************************
- 406           *                         -- UART RECEIVER --
- 407           *  @Descption: Receives message from other device using the uart
- 408           *              receiver pin. Message is read from the buffer and sent
- 409           *              back to the user
- 410           *
- 411           *  @PRECONDITION: called from main() from within main while loop
- 412           *
- 413           *  @POSTCONDITION: individual 8 bit char read from the buffer and
- 414           *                  sent back to the user
- 415           *
- 416           *  @PARAMETER: none
- 417           *
- 418           *  @RETURN: unsigned char
- 419           *************************************************************************/
- 420          /*
- 421          unsigned char uart_rx() {
- 422            unsigned char z;
- 423            while(!RI); //receive flag gets changed only when 8bits are received in SBUF
- 424            z = SBUF;   //Moving data into z variable
- 425            RI = 0;
- 426            return(z);
-C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 14:10:16 PAGE 8   
+ 396           *  @POSTCONDITION: individual message will be sent as one char
+ 397           *
+ 398           *  @PARAMETER: unsigned char
+ 399           *
+ 400           *  @RETURN: none
+ 401           *************************************************************************/
+ 402          /*
+ 403          void uart_tx(unsigned char x) {
+ 404            SBUF = x;   //Load data to serial buffer register associated to UART
+ 405            while(!TI); //transmit flag change when MSB is sent
+ 406            TI=0;       //clear the transmit flag
+ 407          }
+ 408          */
+ 409          /*************************************************************************
+ 410           *                         -- UART RECEIVER --
+ 411           *  @Descption: Receives message from other device using the uart
+ 412           *              receiver pin. Message is read from the buffer and sent
+ 413           *              back to the user
+ 414           *
+ 415           *  @PRECONDITION: called from main() from within main while loop
+ 416           *
+ 417           *  @POSTCONDITION: individual 8 bit char read from the buffer and
+ 418           *                  sent back to the user
+ 419           *
+ 420           *  @PARAMETER: none
+ 421           *
+ 422           *  @RETURN: unsigned char
+ 423           *************************************************************************/
+ 424          /*
+ 425          unsigned char uart_rx() {
+ 426            unsigned char z;
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 21:36:04 PAGE 8   
 
- 427          }
- 428          */
+ 427            while(!RI); //receive flag gets changed only when 8bits are received in SBUF
+ 428            z = SBUF;   //Moving data into z variable
+ 429            RI = 0;
+ 430            return(z);
+ 431          }
+ 432          */
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    164    ----
+   CODE SIZE        =    185    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     72       2
+   DATA SIZE        =     72       3
    IDATA SIZE       =   ----    ----
    BIT SIZE         =      2    ----
 END OF MODULE INFORMATION.

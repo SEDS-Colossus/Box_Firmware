@@ -108,16 +108,22 @@ bit sw10B = 0;
  *  @RETURN: none
  *************************************************************************/
 void main() {
+	unsigned char LED10C = 0;
 	P4SW = 0x70;
-	
 	while(1) {
-		unsigned int count10 = 0;
+		unsigned int count = 0;
 		if(sw10 == 0) { //pressed initially
-			while(sw10 == 0) ++count10; //hold
-			if(count10 > 10) //held long enough
+			while(sw10 == 0) ++count; //hold
+			if(count > 10) //held long enough
 				sw10B = !sw10B; //switch
+			LED10 = !sw10B; //set led state
 		}
 		
+		delay(50);
+		if(sw10B && (LED10C++ > 4)) {
+			LED10C = 0;
+			LED10 = !LED10;
+		}
 	/*
 	
 	while(1) {
@@ -137,9 +143,7 @@ void main() {
 				sw10B = !sw10B;
 			}
 		} */
-		delay(300);
-		LED10 = !sw10B;
-		//delay(10);
+		
 	}
 }
 

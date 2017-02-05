@@ -1,0 +1,526 @@
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE CONTROL_BOX_FIRMWARE
+OBJECT MODULE PLACED IN .\Objects\control_box_firmware.obj
+COMPILER INVOKED BY: C:\Program Files\Keil_v5\C51\BIN\C51.EXE control_box_firmware.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\control_box_firmware.lst) TABS(2) OBJECT(.\Objects\control_box_firmware.obj)
+
+line level    source
+
+   1          //matts board
+   2          /*************************************************************************
+   3           *  @File Descption: Read states of manual override buttons of control_box
+   4           *  and bi-directional communication via UART with main_board.
+   5           *  @File: control_box_firmware.c
+   6           *  @author(s):
+   7           *  -Tawfic Rabbani, Embedded Systems Engineer, head of softwar
+   8           *  -Matthew Santos, Electrical and Software Engineer
+   9           *  @Property of SEDS UCSD
+  10           *  @since: 10/2016
+  11           *************************************************************************/
+  12          #include "reg60s2.h" //Include reg file for 8051 architecure
+  13          //#include <math.h> //used for pow function
+  14          #define OUT_COUNT 20 //1 startkey + 1 tog + 12 sw + 2 pot + 4 crc
+  15          #define IN_COUNT 20 //1 override + 12 solenoidstates + 3 errormessages + 4 crc
+  16          #define STARTKEY 255 //indicates beginning of an array message
+  17          #define HOLD_TIME 8 //time threshold for button press
+  18          #define PEND_NUM 100 //time threshold for pending led state swap
+  19          
+  20          /*************************************************************************
+  21           *                            -- VARIABLES --
+  22           *  Each variable is a pin on the MCU that can be read/write 1/0.
+  23           *  Syntax:
+  24           *       varaible-type  variable-name = pin;
+  25           *************************************************************************/
+  26          sfr P4SW = 0xBB; //special register for using P4 pins as I/O
+  27          
+  28          sbit LED1 = P0^0;
+  29          sbit LED2 = P0^1;
+  30          sbit LED3 = P0^2;
+  31          sbit LED4 = P0^3;
+  32          sbit LED5 = P0^4;
+  33          sbit LED6 = P0^5;
+  34          sbit LED7 = P0^6;
+  35          sbit LED8 = P0^7;
+  36          
+  37          sbit pot1 = P1^0; //TODO: potentiometer analog input
+  38          sbit pot2 = P1^1; //TODO: potentiometer analog input
+  39          sbit battlvl = P1^2; //TODO: battery analog input
+  40          sbit sw1 = P1^3;
+  41          sbit dc = P1^4; //OLED SPI
+  42          sbit din = P1^5; //OLED SPI
+  43          sbit cs= P1^6; //OLED SPI
+  44          sbit sclk = P1^7; //OLED SPI
+  45          
+  46          sbit LED12 = P2^7;
+  47          sbit sw8 = P2^6;
+  48          sbit sw9 = P2^5;
+  49          sbit sw10 = P2^4;
+  50          sbit sw11 = P2^3;
+  51          sbit sw12 = P2^2;
+  52          sbit swTOG = P2^1; //main override toggle switch
+  53          sbit LEDtog = P2^0; //main override indicator
+  54          
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 2   
+
+  55          sbit sw2 = P3^2;
+  56          sbit sw3 = P3^3;
+  57          sbit sw4 = P3^4;
+  58          sbit sw5 = P3^5;
+  59          sbit sw6 = P3^6;
+  60          sbit sw7 = P3^7;
+  61          
+  62          sbit LED9 = P4^6;
+  63          sbit LED10 = P4^5;
+  64          sbit LED11 = P4^4;
+  65          
+  66          /*************************************************************************
+  67           *                           --PROTOTYPES--
+  68           *************************************************************************/
+  69          void uart_init(); //uart initialization
+  70          //bit handshake(); //handshake check
+  71          
+  72          void sendByte(unsigned char dat); //uart TX for an unsigned char
+  73          void send(); //uart TX of output array
+  74          
+  75          bit CRC_check(); //check if no data is lost
+  76          void CRC_generator(); //generate CRC and append to end of data being sent
+  77          
+  78          void button_check(); //check which buttons are activated
+  79          void set_leds(); //set led status based on states received
+  80          //void print_errors(); //TODO: put codes into dictionary to print error messages
+  81          
+  82          void delay(unsigned int x); //standard delay function
+  83          int pow(int base, int exponent); //power function
+  84          
+  85          /*************************************************************************
+  86           *                          --GLOBAL VARIABLES--
+  87           *************************************************************************/
+  88          unsigned char input[IN_COUNT]; //stores all recieved inputs
+  89          /* [0,override][1-12,solenoidstates][13-15,errormessages][16-19,crc] */
+  90          //SOLENOIDSTATES CAN BE 0=INACTIVE, 1=ACTIVE, 2=PENDING
+  91          unsigned char output[OUT_COUNT]; //stores all commands to be sent
+  92          /* [0,STARTKEY][1-12,buttonpresses][13-14,potvals][15,override][16-19,crc] */
+  93          
+  94          long DIVISOR = 0x17; //x^4+x^2+x+1
+  95          long xor_value = 0x0; //for CRC
+  96          long crc = 0x0; //for CRC
+  97          int remainder = 0; //for CRC
+  98          
+  99          int i = 0; //for loops
+ 100          bit busy; //boolean for UART TX holding
+ 101          unsigned int index = 0; //for UART RX array location
+ 102          bit storing = 0; //1 if currently updating RX array, 0 otherwise
+ 103          bit inputChanged = 1; //1 if input data has been updated, 0 otherwise
+ 104          //bit handshake = 0; //1 if handshake successful, 0 otherwise
+ 105          
+ 106          unsigned char LEDtogC = 0;
+ 107          unsigned char LED1C = 0;
+ 108          unsigned char LED2C = 0;
+ 109          unsigned char LED3C = 0;
+ 110          unsigned char LED4C = 0;
+ 111          unsigned char LED5C = 0;
+ 112          unsigned char LED6C = 0;
+ 113          unsigned char LED7C = 0;
+ 114          unsigned char LED8C = 0;
+ 115          unsigned char LED9C = 0;
+ 116          unsigned char LED10C = 0;
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 3   
+
+ 117          unsigned char LED11C = 0;
+ 118          unsigned char LED12C = 0;
+ 119          
+ 120          /*************************************************************************
+ 121           *                          -- MAIN FUNCTION --
+ 122           *  @Descption: This function will instatiate the UART connection.
+ 123           *               Inside the while(1) is where the main code will be
+ 124           *               written.the unsigned char array "input" will be where
+ 125           *               commands will be stored when they are sent over and
+ 126           *               then evaluated. The first bit of input will indicate
+ 127           *               an error message or a state message is being received.
+ 128           *               0 is a state message, 1 is an error message. Input loop
+ 129           *               will end when '?' is sent. This will be the indicator as
+ 130           *               when all informaiton has been sent.
+ 131           *
+ 132           *  @PRECONDITION: none
+ 133           *
+ 134           *  @POSTCONDITION: -connenction between two MCU's will be complete
+ 135           *                  -commands will be received and delt with
+ 136           *                  -commands will be sent to other MCU
+ 137           *
+ 138           *  @PARAMETER: none
+ 139           *
+ 140           *  @RETURN: none
+ 141           *************************************************************************/
+ 142          void main() {
+ 143   1        unsigned int counter = 0;
+ 144   1        P4SW = 0x70; //enable IO for all of P4
+ 145   1        uart_init(); //must be called to initialize communication
+ 146   1        //TODO; if no data has been received yet, tell OLED and wait for data
+ 147   1        while(1) { //loop forever
+ 148   2          if(swTOG == 0) { //override toggle is ON
+ 149   3            output[15] = 1; //set override element
+ 150   3            button_check(); //read button presses
+ 151   3            //TODO: pot_check() read pot values
+ 152   3            CRC_generator(); //append crc to end of output
+ 153   3          } else { //override toggle is OFF
+ 154   3            output[15] = 0; //clear override element
+ 155   3            //don't check buttons, don't check pots
+ 156   3            CRC_generator(); //append crc to end of output
+ 157   3          }
+ 158   2          if(counter++ == 100) {
+ 159   3            counter = 0;
+ 160   3            send(); //transmit output
+ 161   3          }
+ 162   2          if(inputChanged /*&& CRC_check()*/) { //new valid data was recieved
+ 163   3            set_leds(); //update leds based on current data
+ 164   3            //TODO: update OLED info
+ 165   3          }
+ 166   2        } //end while
+ 167   1      } //end main
+ 168          
+ 169          
+ 170          
+ 171          
+ 172          int pow(int base, int exponent)
+ 173          {
+ 174   1        int result;
+ 175   1        while(exponent != 0) {
+ 176   2          result *= base;
+ 177   2          --exponent;
+ 178   2        }
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 4   
+
+ 179   1        return result;
+ 180   1      }
+ 181          
+ 182          bit CRC_check(){
+ 183   1        xor_value = 0x0;
+ 184   1        crc = 0x0;
+ 185   1        remainder = 0;
+ 186   1        
+ 187   1        for(i = 0; i != IN_COUNT; ++i);
+ 188   1            crc = crc + (int)input[i]*pow(2,i);
+ 189   1      
+ 190   1        xor_value = crc ^ DIVISOR;
+ 191   1      
+ 192   1        remainder =  remainder + (xor_value % 2);
+ 193   1        xor_value = xor_value/2;
+ 194   1        remainder =  remainder + (xor_value % 2);
+ 195   1        xor_value = xor_value/2;
+ 196   1        remainder =  remainder + (xor_value % 2);
+ 197   1        xor_value = xor_value/2;
+ 198   1        remainder =  remainder + (xor_value % 2);
+ 199   1      
+ 200   1        if(remainder == 0) return 1;
+ 201   1        else return 0;
+ 202   1      }
+ 203          
+ 204          void CRC_generator() {
+ 205   1        xor_value = 0x0;
+ 206   1        crc = 0x0;
+ 207   1        remainder = 0;
+ 208   1      
+ 209   1        for(i = 0; i < OUT_COUNT - 4; ++i)
+ 210   1          crc = crc + (int)output[i]*pow(2,i);
+ 211   1      
+ 212   1        xor_value = crc ^ DIVISOR;
+ 213   1      
+ 214   1        for(i = OUT_COUNT - 1; i != OUT_COUNT - 5; --i) {
+ 215   2          remainder = xor_value % 2;
+ 216   2          xor_value = xor_value/2;
+ 217   2          if (remainder == 1) output[i] = 1;
+ 218   2          else output[i] = 0;
+ 219   2        }
+ 220   1      }
+ 221          
+ 222          
+ 223          
+ 224          void button_check() {
+ 225   1        unsigned int count = 0;
+ 226   1      
+ 227   1        if(sw1 == 0) { //pressed initially
+ 228   2          while(sw1 == 0) ++count; //hold
+ 229   2          if(count > HOLD_TIME) //held long enough
+ 230   2            output[1] = !output[1]; //switch state
+ 231   2          count = 0; //reset count
+ 232   2        }
+ 233   1        if(sw2 == 0) { //pressed initially
+ 234   2          while(sw2 == 0) ++count; //hold
+ 235   2          if(count > HOLD_TIME) //held long enough
+ 236   2            output[2] = !output[2]; //switch state
+ 237   2          count = 0; //reset count
+ 238   2        }
+ 239   1        if(sw3 == 0) { //pressed initially
+ 240   2          while(sw3 == 0) ++count; //hold
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 5   
+
+ 241   2          if(count > HOLD_TIME) //held long enough
+ 242   2            output[3] = !output[3]; //switch state
+ 243   2          count = 0; //reset count
+ 244   2        }
+ 245   1        if(sw4 == 0) { //pressed initially
+ 246   2          while(sw4 == 0) ++count; //hold
+ 247   2          if(count > HOLD_TIME) //held long enough
+ 248   2            output[4] = !output[4]; //switch state
+ 249   2          count = 0; //reset count
+ 250   2        }
+ 251   1        if(sw5 == 0) { //pressed initially
+ 252   2          while(sw5 == 0) ++count; //hold
+ 253   2          if(count > HOLD_TIME) //held long enough
+ 254   2            output[5] = !output[5]; //switch state
+ 255   2          count = 0; //reset count
+ 256   2        }
+ 257   1        if(sw6 == 0) { //pressed initially
+ 258   2          while(sw6 == 0) ++count; //hold
+ 259   2          if(count > HOLD_TIME) //held long enough
+ 260   2            output[6] = !output[6]; //switch state
+ 261   2          count = 0; //reset count
+ 262   2        }
+ 263   1        if(sw7 == 0) { //pressed initially
+ 264   2          while(sw7 == 0) ++count; //hold
+ 265   2          if(count > HOLD_TIME) //held long enough
+ 266   2            output[7] = !output[7]; //switch state
+ 267   2          count = 0; //reset count
+ 268   2        }
+ 269   1        if(sw8 == 0) { //pressed initially
+ 270   2          while(sw8 == 0) ++count; //hold
+ 271   2          if(count > HOLD_TIME) //held long enough
+ 272   2            output[8] = !output[8]; //switch state
+ 273   2          count = 0; //reset count
+ 274   2        }
+ 275   1        if(sw9 == 0) { //pressed initially
+ 276   2          while(sw9 == 0) ++count; //hold
+ 277   2          if(count > HOLD_TIME) //held long enough
+ 278   2            output[9] = !output[9]; //switch state
+ 279   2          count = 0; //reset count
+ 280   2        }
+ 281   1        if(sw10 == 0) { //pressed initially
+ 282   2          while(sw10 == 0) ++count; //hold
+ 283   2          if(count > HOLD_TIME) //held long enough
+ 284   2            output[10] = !output[10]; //switch state
+ 285   2          count = 0; //reset count
+ 286   2        }
+ 287   1        if(sw11 == 0) { //pressed initially
+ 288   2          while(sw11 == 0) ++count; //hold
+ 289   2          if(count > HOLD_TIME) //held long enough
+ 290   2            output[11] = !output[11]; //switch state
+ 291   2          count = 0; //reset count
+ 292   2        }
+ 293   1        if(sw12 == 0) { //pressed initially
+ 294   2          while(sw12 == 0) ++count; //hold
+ 295   2          if(count > HOLD_TIME) //held long enough
+ 296   2            output[12] = !output[12]; //switch state
+ 297   2          count = 0; //reset count
+ 298   2        }
+ 299   1      }
+ 300          
+ 301          void set_leds() {
+ 302   1        //LEDS are inverted. 1 == off, 0 == on
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 6   
+
+ 303   1          
+ 304   1        if((input[0] == 2) && (LEDtogC++ > PEND_NUM)) { //in pending status
+ 305   2          LEDtogC = 0; //reset counter
+ 306   2          LEDtog = !LEDtog; //invert led state
+ 307   2        } else if(input[0] == 1) LEDtog = 0; //turn led ON
+ 308   1        else if(input[0] == 0) LEDtog = 1; //turn led OFF
+ 309   1        
+ 310   1        if((input[1] == 2) && (LED1C++ > PEND_NUM)) { //in pending status
+ 311   2          LED1C = 0; //reset counter
+ 312   2          LED1 = !LED1; //invert led state
+ 313   2        } else if(input[1] == 1) LED1 = 0; //turn led ON
+ 314   1        else if(input[1] == 0) LED1 = 1; //turn led OFF
+ 315   1        
+ 316   1        if((input[2] == 2) && (LED2C++ > PEND_NUM)) { //in pending status
+ 317   2          LED2C = 0; //reset counter
+ 318   2          LED2 = !LED2; //invert led state
+ 319   2        } else if(input[2] == 1) LED2 = 0; //turn led ON
+ 320   1        else if(input[2] == 0) LED2 = 1; //turn led OFF
+ 321   1      
+ 322   1        if((input[3] == 2) && (LED3C++ > PEND_NUM)) { //in pending status
+ 323   2          LED3C = 0; //reset counter
+ 324   2          LED3 = !LED3; //invert led state
+ 325   2        } else if(input[3] == 1) LED3 = 0; //turn led ON
+ 326   1        else if(input[3] == 0) LED3 = 1; //turn led OFF
+ 327   1        
+ 328   1        if((input[4] == 2) && (LED4C++ > PEND_NUM)) { //in pending status
+ 329   2          LED4C = 0; //reset counter
+ 330   2          LED4 = !LED4; //invert led state
+ 331   2        } else if(input[4] == 1) LED4 = 0; //turn led ON
+ 332   1        else if(input[4] == 0) LED4 = 1; //turn led OFF
+ 333   1      
+ 334   1        if((input[5] == 2) && (LED5C++ > PEND_NUM)) { //in pending status
+ 335   2          LED5C = 0; //reset counter
+ 336   2          LED5 = !LED5; //invert led state
+ 337   2        } else if(input[5] == 1) LED5 = 0; //turn led ON
+ 338   1        else if(input[5] == 0) LED5 = 1; //turn led OFF
+ 339   1        
+ 340   1        if((input[6] == 2) && (LED6C++ > PEND_NUM)) { //in pending status
+ 341   2          LED6C = 0; //reset counter
+ 342   2          LED6 = !LED6; //invert led state
+ 343   2        } else if(input[6] == 1) LED6 = 0; //turn led ON
+ 344   1        else if(input[6] == 0) LED6 = 1; //turn led OFF
+ 345   1        
+ 346   1        if((input[7] == 2) && (LED7C++ > PEND_NUM)) { //in pending status
+ 347   2          LED7C = 0; //reset counter
+ 348   2          LED7 = !LED7; //invert led state
+ 349   2        } else if(input[7] == 1) LED7 = 0; //turn led ON
+ 350   1        else if(input[7] == 0) LED7 = 1; //turn led OFF
+ 351   1        
+ 352   1        if((input[8] == 2) && (LED8C++ > PEND_NUM)) { //in pending status
+ 353   2          LED8C = 0; //reset counter
+ 354   2          LED8 = !LED8; //invert led state
+ 355   2        } else if(input[8] == 1) LED8 = 0; //turn led ON
+ 356   1        else if(input[8] == 0) LED8 = 1; //turn led OFF
+ 357   1        
+ 358   1        if((input[9] == 2) && (LED9C++ > PEND_NUM)) { //in pending status
+ 359   2          LED9C = 0; //reset counter
+ 360   2          LED9 = !LED9; //invert led state
+ 361   2        } else if(input[9] == 1) LED9 = 0; //turn led ON
+ 362   1        else if(input[9] == 0) LED9 = 1; //turn led OFF
+ 363   1        
+ 364   1        if((input[10] == 2) && (LED10C++ > PEND_NUM)) { //in pending status
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 7   
+
+ 365   2          LED10C = 0; //reset counter
+ 366   2          LED10 = !LED10; //invert led state
+ 367   2        } else if(input[10] == 1) LED10 = 0; //turn led ON
+ 368   1        else if(input[10] == 0) LED10 = 1; //turn led OFF
+ 369   1        
+ 370   1        if((input[11] == 2) && (LED11C++ > PEND_NUM)) { //in pending status
+ 371   2          LED11C = 0; //reset counter
+ 372   2          LED11 = !LED11; //invert led state
+ 373   2        } else if(input[11] == 1) LED11 = 0; //turn led ON
+ 374   1        else if(input[11] == 0) LED11 = 1; //turn led OFF
+ 375   1        
+ 376   1        if((input[12] == 2) && (LED12C++ > PEND_NUM)) { //in pending status
+ 377   2          LED12C = 0; //reset counter
+ 378   2          LED12 = !LED12; //invert led state
+ 379   2        } else if(input[12] == 1) LED12 = 0; //turn led ON
+ 380   1        else if(input[12] == 0) LED12 = 1; //turn led OFF
+ 381   1      }
+ 382          
+ 383          /*************************************************************************
+ 384           *                       -- UART INITIALIZATION --
+ 385           *  @Descption: First thing called from the main function. This will
+ 386           *              instantiate the uart, timer for baud rate, and uart 
+ 387           *              interrupt
+ 388           *
+ 389           *  @PRECONDITION: main() is called
+ 390           *
+ 391           *  @POSTCONDITION: Data buffer is set to 8 bit length, baud rate set
+ 392           *                  to 9600 baud, uart interrupt is enabled
+ 393           *
+ 394           *  @PARAMETER: none
+ 395           *
+ 396           *  @RETURN: none
+ 397           *************************************************************************/
+ 398          void uart_init() {
+ 399   1        SCON = 0x50; //8-bit variable UART
+ 400   1        TMOD = 0x20; //timer 1 in mode 2 i.e. auto reload mode
+ 401   1        TH1 = 0xFD; //reload value is FD for 9600 baud rate
+ 402   1        TR1 = 1; //Timer 1 enable
+ 403   1        ES = 1; //Enable UART interrupt
+ 404   1        EA = 1; //Open master interrupt switch
+ 405   1        
+ 406   1        for(i = 0; i < OUT_COUNT; ++i) //initialize output array to zeros
+ 407   1          output[i] = 0;
+ 408   1        for(i = 0; i < IN_COUNT; ++i) //initialize input array to zeros
+ 409   1          input[i] = 0;
+ 410   1      }
+ 411          
+ 412          /*************************************************************************
+ 413           *                  -- UART interrupt service routine --
+ 414           *  @Descption: 
+ 415           *
+ 416           *  @PRECONDITION: 
+ 417           *
+ 418           *  @POSTCONDITION: 
+ 419           *
+ 420           *  @PARAMETER: 
+ 421           *
+ 422           *  @RETURN: none
+ 423           *************************************************************************/
+ 424          void Uart_Isr() interrupt 4 using 1
+ 425          {
+ 426   1        unsigned char c;
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 8   
+
+ 427   1        if(RI) { //receive flagged
+ 428   2          RI = 0; //reset receive flag
+ 429   2          c = SBUF; //store buffer in c
+ 430   2          if(c == STARTKEY) { //start key is received
+ 431   3            storing = 1; //set that we are now storing
+ 432   3            index = 0; //start from beginning of array
+ 433   3          } else if(storing) { //we are in storing mode
+ 434   3            input[index] = c; //store SBUF in current index of array
+ 435   3            ++index; //increment array index
+ 436   3          }
+ 437   2          if(index >= IN_COUNT) { //read in enough values
+ 438   3            storing = 0; //set that we are done storing
+ 439   3            index = 0; //reset index
+ 440   3            inputChanged = 1; //tell the program that new data has been delivered
+ 441   3          }
+ 442   2        }
+ 443   1          
+ 444   1        if(TI) { //transmit flagged
+ 445   2          TI = 0; //Clear transmit interrupt flag
+ 446   2          busy = 0; //Clear transmit busy flag
+ 447   2        }
+ 448   1      }
+ 449          
+ 450          /*************************************************************************
+ 451           *                  -- UART Transmission of a Byte --
+ 452           *  @Descption: send a byte of data (unsigned char) to UART
+ 453           *
+ 454           *  @PRECONDITION: 
+ 455           *
+ 456           *  @POSTCONDITION: 
+ 457           *
+ 458           *  @PARAMETER: dat (data to be sent)
+ 459           *
+ 460           *  @RETURN: none
+ 461           *************************************************************************/
+ 462          void sendByte(unsigned char dat)
+ 463          {
+ 464   1        while(busy); //Wait for the completion of the previous data is sent
+ 465   1        busy = 1; //set transmit busy flag
+ 466   1        SBUF = dat; //Send data to UART buffer
+ 467   1      }
+ 468          
+ 469          /*************************************************************************
+ 470           *                  -- UART Transmission of an Array --
+ 471           *  @Descption: send the output array to UART
+ 472           *
+ 473           *  @PRECONDITION: 
+ 474           *
+ 475           *  @POSTCONDITION: 
+ 476           *
+ 477           *  @PARAMETER: none
+ 478           *
+ 479           *  @RETURN: none
+ 480           *************************************************************************/
+ 481          void send()
+ 482          {
+ 483   1        for(i = 0; i < OUT_COUNT; ++i) {
+ 484   2          sendByte(output[i]);
+ 485   2        }
+ 486   1      }
+
+
+C51 COMPILER V9.56.0.0   CONTROL_BOX_FIRMWARE                                              02/04/2017 22:31:17 PAGE 9   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1710    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     71       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
